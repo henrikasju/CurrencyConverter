@@ -79,20 +79,6 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
     on("INJECTION_BUNDLE_NOTIFICATION") {
         self.view = CurrencyConverterView()
     }
-//
-//    let viewBox: UIView = {
-//        let view = UIView()
-//        view.translatesAutoresizingMaskIntoConstraints = false
-//        view.heightAnchor.constraint(equalToConstant: 50).isActive = true
-//        view.widthAnchor.constraint(equalTo: view.heightAnchor).isActive = true
-//        view.backgroundColor = .black
-//
-//        return view
-//    }()
-//
-//    view.addSubview(viewBox)
-//    viewBox.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-//    view.backgroundColor = .blue
 
     doSomething()
   }
