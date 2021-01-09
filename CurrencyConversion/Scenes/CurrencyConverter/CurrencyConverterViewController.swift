@@ -11,6 +11,7 @@
 //
 
 import UIKit
+import Stevia
 
 protocol CurrencyConverterDisplayLogic: class
 {
@@ -19,8 +20,12 @@ protocol CurrencyConverterDisplayLogic: class
 
 class CurrencyConverterViewController: UIViewController, CurrencyConverterDisplayLogic
 {
+    
   var interactor: CurrencyConverterBusinessLogic?
   var router: (NSObjectProtocol & CurrencyConverterRoutingLogic & CurrencyConverterDataPassing)?
+
+  private let v = CurrencyConverterView()
+  override func loadView() { view = v }
 
   // MARK: Object lifecycle
   
@@ -69,7 +74,26 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   override func viewDidLoad()
   {
     super.viewDidLoad()
-    view.backgroundColor = .red
+
+    // TODO: Remove on release build!
+    on("INJECTION_BUNDLE_NOTIFICATION") {
+        self.view = CurrencyConverterView()
+    }
+//
+//    let viewBox: UIView = {
+//        let view = UIView()
+//        view.translatesAutoresizingMaskIntoConstraints = false
+//        view.heightAnchor.constraint(equalToConstant: 50).isActive = true
+//        view.widthAnchor.constraint(equalTo: view.heightAnchor).isActive = true
+//        view.backgroundColor = .black
+//
+//        return view
+//    }()
+//
+//    view.addSubview(viewBox)
+//    viewBox.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+//    view.backgroundColor = .blue
+
     doSomething()
   }
   

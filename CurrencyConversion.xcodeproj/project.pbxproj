@@ -14,6 +14,7 @@
 		36838CF025A9DEC300AE937B /* CurrencyConverterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838CEA25A9DEC300AE937B /* CurrencyConverterViewController.swift */; };
 		36838CF125A9DEC300AE937B /* CurrencyConverterInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838CEB25A9DEC300AE937B /* CurrencyConverterInteractor.swift */; };
 		36838CF725A9FBB800AE937B /* Stevia in Frameworks */ = {isa = PBXBuildFile; productRef = 36838CF625A9FBB800AE937B /* Stevia */; };
+		36838D0325AA072E00AE937B /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838D0225AA072E00AE937B /* CurrencyConverterView.swift */; };
 		369A38F325A9D5290052981F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 369A38F225A9D5290052981F /* AppDelegate.swift */; };
 		369A38F525A9D5290052981F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 369A38F425A9D5290052981F /* SceneDelegate.swift */; };
 		369A38FC25A9D52C0052981F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 369A38FB25A9D52C0052981F /* Assets.xcassets */; };
@@ -27,6 +28,7 @@
 		36838CE925A9DEC300AE937B /* CurrencyConverterModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterModels.swift; sourceTree = "<group>"; };
 		36838CEA25A9DEC300AE937B /* CurrencyConverterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterViewController.swift; sourceTree = "<group>"; };
 		36838CEB25A9DEC300AE937B /* CurrencyConverterInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterInteractor.swift; sourceTree = "<group>"; };
+		36838D0225AA072E00AE937B /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
 		369A38EF25A9D5290052981F /* CurrencyConversion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CurrencyConversion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		369A38F225A9D5290052981F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		369A38F425A9D5290052981F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -50,6 +52,7 @@
 		36838CE425A9DEB400AE937B /* CurrencyConverter */ = {
 			isa = PBXGroup;
 			children = (
+				36838D0125AA069600AE937B /* UIElements */,
 				36838CE625A9DEC300AE937B /* CurrencyConverterPresenter.swift */,
 				36838CE725A9DEC300AE937B /* CurrencyConverterWorker.swift */,
 				36838CE825A9DEC300AE937B /* CurrencyConverterRouter.swift */,
@@ -65,6 +68,14 @@
 			children = (
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		36838D0125AA069600AE937B /* UIElements */ = {
+			isa = PBXGroup;
+			children = (
+				36838D0225AA072E00AE937B /* CurrencyConverterView.swift */,
+			);
+			path = UIElements;
 			sourceTree = "<group>";
 		};
 		369A38E625A9D5290052981F = {
@@ -202,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				36838CEE25A9DEC300AE937B /* CurrencyConverterRouter.swift in Sources */,
+				36838D0325AA072E00AE937B /* CurrencyConverterView.swift in Sources */,
 				36838CEC25A9DEC300AE937B /* CurrencyConverterPresenter.swift in Sources */,
 				36838CF025A9DEC300AE937B /* CurrencyConverterViewController.swift in Sources */,
 				369A38F325A9D5290052981F /* AppDelegate.swift in Sources */,
@@ -281,6 +293,10 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-Xlinker",
+					"-interposable",
+				);
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -335,6 +351,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
