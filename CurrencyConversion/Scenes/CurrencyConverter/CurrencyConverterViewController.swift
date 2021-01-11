@@ -20,12 +20,25 @@ protocol CurrencyConverterDisplayLogic: class
 
 class CurrencyConverterViewController: UIViewController, CurrencyConverterDisplayLogic
 {
-    
   var interactor: CurrencyConverterBusinessLogic?
   var router: (NSObjectProtocol & CurrencyConverterRoutingLogic & CurrencyConverterDataPassing)?
 
   private let v = CurrencyConverterView()
   override func loadView() { view = v }
+
+  private let currencyPickerView: UIPickerView = {
+    let pickerView = UIPickerView()
+
+    return pickerView
+  }()
+
+  private let inputViewToolBar: UIToolbar = {
+    let toolBar = UIToolbar()
+    toolBar.sizeToFit()
+    toolBar.isUserInteractionEnabled = true
+
+    return toolBar
+  }()
 
   // MARK: Object lifecycle
   
@@ -40,7 +53,7 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
     super.init(coder: aDecoder)
     setup()
   }
-  
+
   // MARK: Setup
   
   private func setup()
@@ -68,6 +81,10 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
       }
     }
   }
+
+  override func viewWillAppear(_ animated: Bool) {
+    navigationItem.title = "Currency converter"
+  }
   
   // MARK: View lifecycle
   
@@ -75,10 +92,28 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   {
     super.viewDidLoad()
 
-    // TODO: Remove on release build!
-    on("INJECTION_BUNDLE_NOTIFICATION") {
-        self.view = CurrencyConverterView()
-    }
+    v.collectionView.collectionViewLayout = createCompositionalLayout()
+    v.collectionView.dataSource = self
+
+    currencyPickerView.delegate = self
+    currencyPickerView.dataSource = self
+
+    v.collectionView.register(
+      HorizontalBalanceCollectionViewCell.self,
+      forCellWithReuseIdentifier: HorizontalBalanceCollectionViewCell.identifier)
+    v.collectionView.register(
+      CurrencyExchangeCollectionViewCell.self,
+      forCellWithReuseIdentifier: CurrencyExchangeCollectionViewCell.identifier)
+    v.collectionView.register(TitleHeaderCollectionReusableView.self,
+      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+      withReuseIdentifier: TitleHeaderCollectionReusableView.identifier)
+
+    v.submitButton.addTarget(self, action: #selector(submitButtonPressed(sender:)), for: .touchUpInside)
+
+    let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.endEditing))
+    // BUG
+//    inputViewToolBar.setItems([doneButton], animated: true)
+
 
     doSomething()
   }
@@ -89,12 +124,180 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   
   func doSomething()
   {
-    let request = CurrencyConverter.Something.Request()
-    interactor?.doSomething(request: request)
+    let request = CurrencyConverter.FetchCurrencyConversion.Request(fromAmount: 340.51, fromCurrency: "EUR", toCurrency: "JPY")
+    interactor?.fetchCurrencyConversion(request: request)
   }
   
   func displaySomething(viewModel: CurrencyConverter.Something.ViewModel)
   {
     //nameTextField.text = viewModel.name
+  }
+
+  private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
+    return UICollectionViewCompositionalLayout { (sectionNumber, env) -> NSCollectionLayoutSection? in
+      switch sectionNumber {
+        case 0: return self.horizontalScrollLayoutSection()
+        default: return self.singleRowLayoutSection()
+      }
+    }
+  }
+
+  private func horizontalScrollLayoutSection() -> NSCollectionLayoutSection {
+    let itemSize = NSCollectionLayoutSize(widthDimension: .estimated(40), heightDimension: .absolute(40))
+    let item = NSCollectionLayoutItem(layoutSize: itemSize)
+    
+    let group = NSCollectionLayoutGroup.horizontal(layoutSize: itemSize, subitems: [item])
+
+    let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(40))
+    let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+
+    let section = NSCollectionLayoutSection(group: group)
+    section.boundarySupplementaryItems = [header]
+    section.orthogonalScrollingBehavior = .continuous
+    section.interGroupSpacing = 40
+    section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)
+
+    return section
+  }
+
+  private func singleRowLayoutSection() -> NSCollectionLayoutSection {
+    let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(60))
+    let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+    let group = NSCollectionLayoutGroup.horizontal(layoutSize: itemSize, subitems: [item])
+    let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(40))
+    let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+
+    let section = NSCollectionLayoutSection(group: group)
+    section.boundarySupplementaryItems = [header]
+    section.interGroupSpacing = 2
+    section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)
+
+
+    return section
+  }
+
+
+
+  @objc func endEditing() {
+    view.endEditing(true)
+  }
+}
+
+//MARK: - UICollectionViewDataSource
+extension CurrencyConverterViewController: UICollectionViewDataSource {
+
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    switch section {
+    case 0:
+      return 9
+    case 1:
+      return 2
+    default:
+      return 0
+    }
+  }
+
+  func numberOfSections(in collectionView: UICollectionView) -> Int {
+    return 2
+  }
+
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
+    if indexPath.section == 0,
+    let cell = collectionView.dequeueReusableCell( withReuseIdentifier: HorizontalBalanceCollectionViewCell.identifier,
+                                                   for: indexPath) as? HorizontalBalanceCollectionViewCell {
+
+      cell.amountLabel.text(String(repeating: "0", count: indexPath.row) + "00.00")
+
+      return cell
+    } else if indexPath.section == 1,
+      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CurrencyExchangeCollectionViewCell.identifier,
+                                                    for: indexPath) as? CurrencyExchangeCollectionViewCell {
+      cell.inputTextField.keyboardType = .decimalPad
+
+      if indexPath.row == 0 {
+        cell.actionLabel.text("Sell")
+        cell.actionImageView.image = UIImage(named: "currencySellImage")
+
+        cell.inputTextField.inputView = currencyPickerView
+        cell.inputTextField.inputAccessoryView = inputViewToolBar
+
+        
+      }else if indexPath.row == 1 {
+        cell.actionLabel.text("Receive")
+        cell.actionImageView.image = UIImage(named: "currencyReceiveImage")
+        cell.inputTextField.textColor = .systemGreen
+        cell.inputTextField.isUserInteractionEnabled = false
+      }
+      
+      return cell
+    }else{
+      fatalError("Could not deque cell!")
+    }
+  }
+
+  func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+
+    if kind == UICollectionView.elementKindSectionHeader,
+       let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier, for: indexPath) as? TitleHeaderCollectionReusableView {
+
+      headerView.backgroundColor = .clear
+
+      if indexPath.section == 0 {
+        headerView.titleLabel.text("MY BALANCES")
+      }else if indexPath.section == 1 {
+        headerView.titleLabel.text("CURRENCY EXCHANGE")
+      }
+
+      return headerView
+    }else{
+      fatalError("Could not deque section header!")
+    }
+  }
+}
+
+var idk: CGFloat = -270
+
+//MARK: - UIButton Targets
+extension CurrencyConverterViewController {
+
+  @objc func submitButtonPressed(sender: UIButton) {
+    if sender == v.submitButton {
+      print("Submit button pressed!")
+
+//      self.v.bottomConstraint?.constant += idk
+
+      UIView.animate(withDuration: 0.1) {
+        self.v.submitButtonBottomConstraint?.constant = idk
+        self.v.layoutIfNeeded()
+      }
+
+      if idk == -270 {
+        idk = 0
+      }else{
+        idk = -270
+      }
+    }
+  }
+}
+
+//MARK: - UIPickerViewDelegate
+extension CurrencyConverterViewController: UIPickerViewDelegate {
+
+}
+
+//MARK: - UIPickerViewDataSource
+extension CurrencyConverterViewController: UIPickerViewDataSource {
+  func numberOfComponents(in pickerView: UIPickerView) -> Int {
+    return 1
+  }
+
+  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    return 5
+  }
+
+  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    return "Title - " + String(row)
   }
 }

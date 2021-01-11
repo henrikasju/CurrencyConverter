@@ -16,14 +16,34 @@ enum CurrencyConverter
 {
   // MARK: Use cases
   
+  enum FetchCurrencyConversion
+  {
+    struct Request
+    {
+      var fromAmount: Double
+      var fromCurrency: String
+      var toCurrency: String
+    }
+
+    struct Response
+    {
+    }
+
+    struct ViewModel
+    {
+    }
+  }
+
   enum Something
   {
     struct Request
     {
     }
+
     struct Response
     {
     }
+
     struct ViewModel
     {
     }

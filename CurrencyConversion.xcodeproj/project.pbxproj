@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		363C648A25AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363C648925AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift */; };
+		36784D5B25ACB22E002B05ED /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 36784D5A25ACB22E002B05ED /* Alamofire */; };
 		36838CEC25A9DEC300AE937B /* CurrencyConverterPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838CE625A9DEC300AE937B /* CurrencyConverterPresenter.swift */; };
 		36838CED25A9DEC300AE937B /* CurrencyConverterWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838CE725A9DEC300AE937B /* CurrencyConverterWorker.swift */; };
 		36838CEE25A9DEC300AE937B /* CurrencyConverterRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838CE825A9DEC300AE937B /* CurrencyConverterRouter.swift */; };
@@ -15,6 +17,8 @@
 		36838CF125A9DEC300AE937B /* CurrencyConverterInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838CEB25A9DEC300AE937B /* CurrencyConverterInteractor.swift */; };
 		36838CF725A9FBB800AE937B /* Stevia in Frameworks */ = {isa = PBXBuildFile; productRef = 36838CF625A9FBB800AE937B /* Stevia */; };
 		36838D0325AA072E00AE937B /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838D0225AA072E00AE937B /* CurrencyConverterView.swift */; };
+		36838D0E25AA470E00AE937B /* HorizontalBalanceCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838D0D25AA470D00AE937B /* HorizontalBalanceCollectionViewCell.swift */; };
+		36838D1425AA742700AE937B /* CurrencyExchangeCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36838D1325AA742700AE937B /* CurrencyExchangeCollectionViewCell.swift */; };
 		369A38F325A9D5290052981F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 369A38F225A9D5290052981F /* AppDelegate.swift */; };
 		369A38F525A9D5290052981F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 369A38F425A9D5290052981F /* SceneDelegate.swift */; };
 		369A38FC25A9D52C0052981F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 369A38FB25A9D52C0052981F /* Assets.xcassets */; };
@@ -22,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		363C648925AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 		36838CE625A9DEC300AE937B /* CurrencyConverterPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterPresenter.swift; sourceTree = "<group>"; };
 		36838CE725A9DEC300AE937B /* CurrencyConverterWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterWorker.swift; sourceTree = "<group>"; };
 		36838CE825A9DEC300AE937B /* CurrencyConverterRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterRouter.swift; sourceTree = "<group>"; };
@@ -29,6 +34,8 @@
 		36838CEA25A9DEC300AE937B /* CurrencyConverterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterViewController.swift; sourceTree = "<group>"; };
 		36838CEB25A9DEC300AE937B /* CurrencyConverterInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterInteractor.swift; sourceTree = "<group>"; };
 		36838D0225AA072E00AE937B /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
+		36838D0D25AA470D00AE937B /* HorizontalBalanceCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalBalanceCollectionViewCell.swift; sourceTree = "<group>"; };
+		36838D1325AA742700AE937B /* CurrencyExchangeCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyExchangeCollectionViewCell.swift; sourceTree = "<group>"; };
 		369A38EF25A9D5290052981F /* CurrencyConversion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CurrencyConversion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		369A38F225A9D5290052981F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		369A38F425A9D5290052981F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -43,12 +50,54 @@
 			buildActionMask = 2147483647;
 			files = (
 				36838CF725A9FBB800AE937B /* Stevia in Frameworks */,
+				36784D5B25ACB22E002B05ED /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		363C648125AB121700BDF96E /* CollectionViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				36838D0D25AA470D00AE937B /* HorizontalBalanceCollectionViewCell.swift */,
+				36838D1325AA742700AE937B /* CurrencyExchangeCollectionViewCell.swift */,
+			);
+			path = CollectionViewCells;
+			sourceTree = "<group>";
+		};
+		363C648525AB171800BDF96E /* CollecitonView */ = {
+			isa = PBXGroup;
+			children = (
+				363C648725AB173D00BDF96E /* CollectionReusableViews */,
+			);
+			path = CollecitonView;
+			sourceTree = "<group>";
+		};
+		363C648625AB172800BDF96E /* CollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				363C648125AB121700BDF96E /* CollectionViewCells */,
+			);
+			path = CollectionView;
+			sourceTree = "<group>";
+		};
+		363C648725AB173D00BDF96E /* CollectionReusableViews */ = {
+			isa = PBXGroup;
+			children = (
+				363C648925AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift */,
+			);
+			path = CollectionReusableViews;
+			sourceTree = "<group>";
+		};
+		363C648825AB174100BDF96E /* UIElements */ = {
+			isa = PBXGroup;
+			children = (
+				363C648525AB171800BDF96E /* CollecitonView */,
+			);
+			path = UIElements;
+			sourceTree = "<group>";
+		};
 		36838CE425A9DEB400AE937B /* CurrencyConverter */ = {
 			isa = PBXGroup;
 			children = (
@@ -66,6 +115,7 @@
 		36838CF325A9DEE500AE937B /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				363C648825AB174100BDF96E /* UIElements */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -74,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				36838D0225AA072E00AE937B /* CurrencyConverterView.swift */,
+				363C648625AB172800BDF96E /* CollectionView */,
 			);
 			path = UIElements;
 			sourceTree = "<group>";
@@ -126,7 +177,6 @@
 				369A38EB25A9D5290052981F /* Sources */,
 				369A38EC25A9D5290052981F /* Frameworks */,
 				369A38ED25A9D5290052981F /* Resources */,
-				36838CF425A9EDF500AE937B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -135,6 +185,7 @@
 			name = CurrencyConversion;
 			packageProductDependencies = (
 				36838CF625A9FBB800AE937B /* Stevia */,
+				36784D5A25ACB22E002B05ED /* Alamofire */,
 			);
 			productName = CurrencyConversion;
 			productReference = 369A38EF25A9D5290052981F /* CurrencyConversion.app */;
@@ -165,6 +216,7 @@
 			mainGroup = 369A38E625A9D5290052981F;
 			packageReferences = (
 				36838CF525A9FBB800AE937B /* XCRemoteSwiftPackageReference "Stevia" */,
+				36784D5925ACB22D002B05ED /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = 369A38F025A9D5290052981F /* Products */;
 			projectDirPath = "";
@@ -187,26 +239,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		36838CF425A9EDF500AE937B /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ -f ~/com.raywenderlich.swiftlint.yml ]; then\n  if which swiftlint >/dev/null; then\n    swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml\n  fi\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		369A38EB25A9D5290052981F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -217,10 +249,13 @@
 				36838CEC25A9DEC300AE937B /* CurrencyConverterPresenter.swift in Sources */,
 				36838CF025A9DEC300AE937B /* CurrencyConverterViewController.swift in Sources */,
 				369A38F325A9D5290052981F /* AppDelegate.swift in Sources */,
+				36838D1425AA742700AE937B /* CurrencyExchangeCollectionViewCell.swift in Sources */,
+				36838D0E25AA470E00AE937B /* HorizontalBalanceCollectionViewCell.swift in Sources */,
 				36838CEF25A9DEC300AE937B /* CurrencyConverterModels.swift in Sources */,
 				36838CED25A9DEC300AE937B /* CurrencyConverterWorker.swift in Sources */,
 				369A38F525A9D5290052981F /* SceneDelegate.swift in Sources */,
 				36838CF125A9DEC300AE937B /* CurrencyConverterInteractor.swift in Sources */,
+				363C648A25AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,10 +328,6 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-Xlinker",
-					"-interposable",
-				);
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -421,6 +452,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		36784D5925ACB22D002B05ED /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.4.1;
+			};
+		};
 		36838CF525A9FBB800AE937B /* XCRemoteSwiftPackageReference "Stevia" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/freshOS/Stevia";
@@ -432,6 +471,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		36784D5A25ACB22E002B05ED /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 36784D5925ACB22D002B05ED /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
 		36838CF625A9FBB800AE937B /* Stevia */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 36838CF525A9FBB800AE937B /* XCRemoteSwiftPackageReference "Stevia" */;

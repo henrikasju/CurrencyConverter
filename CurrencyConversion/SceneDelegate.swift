@@ -13,13 +13,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+      guard let windowScene = (scene as? UIWindowScene) else { return }
 
-        guard let windowScene = (scene as? UIWindowScene) else { return }
+      window = UIWindow(windowScene: windowScene)
+      let rootVC = UINavigationController(rootViewController: CurrencyConverterViewController())
 
-        window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = CurrencyConverterViewController()
-        window?.makeKeyAndVisible()
+      window?.rootViewController = rootVC
+      setupNavigationBarAppearance()
+      window?.makeKeyAndVisible()
     }
+
+  func setupNavigationBarAppearance() {
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithOpaqueBackground()
+    appearance.backgroundColor = UIColor(named: "secondaryColor")
+    appearance.titleTextAttributes = [
+      .foregroundColor: UIColor.white,
+      .font: UIFont.systemFont(ofSize: 17, weight: .medium)
+    ]
+
+    UINavigationBar.appearance().standardAppearance = appearance
+    UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    UINavigationBar.appearance().compactAppearance = appearance
+  }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

@@ -11,10 +11,11 @@
 //
 
 import UIKit
+import Alamofire
 
 protocol CurrencyConverterBusinessLogic
 {
-  func doSomething(request: CurrencyConverter.Something.Request)
+  func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
 }
 
 protocol CurrencyConverterDataStore
@@ -30,12 +31,14 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
   
   // MARK: Do something
   
-  func doSomething(request: CurrencyConverter.Something.Request)
+  func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   {
-    worker = CurrencyConverterWorker()
-    worker?.doSomeWork()
+
     
-    let response = CurrencyConverter.Something.Response()
-    presenter?.presentSomething(response: response)
+//    worker = CurrencyConverterWorker()
+//    worker?.doSomeWork()
+//
+//    let response = CurrencyConverter.Something.Response()
+//    presenter?.presentSomething(response: response)
   }
 }

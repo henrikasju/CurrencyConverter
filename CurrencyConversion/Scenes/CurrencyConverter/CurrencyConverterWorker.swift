@@ -14,7 +14,8 @@ import UIKit
 
 class CurrencyConverterWorker
 {
-  func doSomeWork()
+  func fetch()
   {
+    
   }
 }
