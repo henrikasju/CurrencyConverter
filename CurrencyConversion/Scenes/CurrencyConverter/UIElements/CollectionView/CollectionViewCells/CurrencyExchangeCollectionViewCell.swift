@@ -73,7 +73,7 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
 //    actionLabel.lineBreak
 
     inputTextField.backgroundColor = .clear
-    inputTextField.text = "00.00"
+    inputTextField.text = "110.00"
     inputTextField.textAlignment = .right
     inputTextField.font = localFont
     inputTextField.textColor = localFontColor

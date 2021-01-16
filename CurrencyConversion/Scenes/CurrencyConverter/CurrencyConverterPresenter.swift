@@ -11,10 +11,11 @@
 //
 
 import UIKit
+import Alamofire
 
 protocol CurrencyConverterPresentationLogic
 {
-  func presentSomething(response: CurrencyConverter.Something.Response)
+  func presentCurrencyConversion(response: CurrencyConverter.FetchCurrencyConversion.Response)
 }
 
 class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
@@ -22,10 +23,38 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
   weak var viewController: CurrencyConverterDisplayLogic?
   
   // MARK: Do something
+
+  func presentCurrencyConversionErrorAlert(error: Error ) {
+    var viewModel: CurrencyConverter.ErrorAlert.ViewModel
+
+    if let knownError = error as? ErrorType {
+      switch knownError {
+      case .InvalidConversionInput :
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Invalid Conversion", message: "Invalid conversion input", buttonTitle: "Close")
+      }
+    }else if let apiError = error as? AFError {
+      viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Server issue", message: "Servers issues, please try again. (\(apiError.localizedDescription))", buttonTitle: "Close")
+    }else {
+      viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "App issue", message: "App is currently misbehaving, sorry for inconvenience. " + error.localizedDescription, buttonTitle: "Close")
+    }
+
+    viewController?.displayErrorAlert(viewModel: viewModel)
+  }
   
-  func presentSomething(response: CurrencyConverter.Something.Response)
+  func presentCurrencyConversion(response: CurrencyConverter.FetchCurrencyConversion.Response)
   {
-    let viewModel = CurrencyConverter.Something.ViewModel()
-    viewController?.displaySomething(viewModel: viewModel)
+    if let error = response.error {
+      print("Display ERROR!!!!!")
+      presentCurrencyConversionErrorAlert(error: error)
+
+    }else if let conversion = response.conversion, let fee = response.fee {
+      let feeString = NumberFormatter.localizedString(from: NSNumber(value: fee), number: .decimal)
+      let viewModel = CurrencyConverter.FetchCurrencyConversion.ViewModel(receive: "+ " + conversion.amount, fee: feeString)
+
+      viewController?.displayCurrencyConversion(viewModel: viewModel)
+    }
+
+//    let viewModel = CurrencyConverter.Something.ViewModel()
+//    viewController?.displaySomething(viewModel: viewModel)
   }
 }

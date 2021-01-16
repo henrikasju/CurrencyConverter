@@ -26,19 +26,34 @@ protocol CurrencyConverterDataStore
 class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConverterDataStore
 {
   var presenter: CurrencyConverterPresentationLogic?
-  var worker: CurrencyConverterWorker?
-  //var name: String = ""
-  
-  // MARK: Do something
-  
+  var worker: CurrencyConversionWorker?
+  var currencyConversionWorker: CurrencyConversionWorker?
+
   func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   {
+    // validate request!
+    let numberFormatter = NumberFormatter()
+    if numberFormatter.number(from: request.fromAmount)?.doubleValue == nil {
+      print("Error invalid number format!")
+      let response = CurrencyConverter.FetchCurrencyConversion.Response(error: ErrorType.InvalidConversionInput)
+      presenter?.presentCurrencyConversion(response: response)
+    }
 
-    
-//    worker = CurrencyConverterWorker()
-//    worker?.doSomeWork()
-//
-//    let response = CurrencyConverter.Something.Response()
-//    presenter?.presentSomething(response: response)
-  }
+      currencyConversionWorker?.fetchConvertedCurrency(fromAmount: request.fromAmount,
+                                                       fromCurrency: request.fromCurrency,
+                                                       toCurrency: request.toCurrency,
+                                                       completion:
+      { response in
+        switch response.result {
+        case .success:
+          let conversion = CurrencyConverter.FetchCurrencyConversion.Response(conversion: response.value, fee: 0.00)
+          self.presenter?.presentCurrencyConversion(response: conversion)
+        case let .failure(error):
+          let conversion = CurrencyConverter.FetchCurrencyConversion.Response(error: error)
+          self.presenter?.presentCurrencyConversion(response: conversion)
+        }
+      })
+
+    }
+  
 }

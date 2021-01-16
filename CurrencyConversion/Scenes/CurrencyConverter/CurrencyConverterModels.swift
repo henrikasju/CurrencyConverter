@@ -11,6 +11,11 @@
 //
 
 import UIKit
+import Alamofire
+
+enum ErrorType: Error {
+  case InvalidConversionInput
+}
 
 enum CurrencyConverter
 {
@@ -20,17 +25,42 @@ enum CurrencyConverter
   {
     struct Request
     {
-      var fromAmount: Double
+      var fromAmount: String
       var fromCurrency: String
       var toCurrency: String
     }
 
     struct Response
     {
+      var conversion: ConvertedCurrency?
+      var fee: Double?
+      var error: Error?
     }
 
     struct ViewModel
     {
+      var receive: String
+      var fee: String
+    }
+  }
+
+  enum ErrorAlert
+  {
+
+    struct Request
+    {
+    }
+
+    struct Response
+    {
+      var error: Error
+    }
+
+    struct ViewModel
+    {
+      var title: String
+      var message: String
+      var buttonTitle: String
     }
   }
 

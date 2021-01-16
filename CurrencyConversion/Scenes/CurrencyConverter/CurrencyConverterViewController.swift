@@ -15,7 +15,8 @@ import Stevia
 
 protocol CurrencyConverterDisplayLogic: class
 {
-  func displaySomething(viewModel: CurrencyConverter.Something.ViewModel)
+  func displayCurrencyConversion(viewModel: CurrencyConverter.FetchCurrencyConversion.ViewModel)
+  func displayErrorAlert(viewModel: CurrencyConverter.ErrorAlert.ViewModel)
 }
 
 class CurrencyConverterViewController: UIViewController, CurrencyConverterDisplayLogic
@@ -25,6 +26,11 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
 
   private let v = CurrencyConverterView()
   override func loadView() { view = v }
+
+  private var conversionSection: (
+    input: (textField: UITextField?, currencySelectionButton: UIButton?)?,
+    output: (textField: UITextField?, currencySelectionButton: UIButton?)?
+  )
 
   private let currencyPickerView: UIPickerView = {
     let pickerView = UIPickerView()
@@ -65,6 +71,7 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
     viewController.interactor = interactor
     viewController.router = router
     interactor.presenter = presenter
+    interactor.currencyConversionWorker = CurrencyConversionWorker()
     presenter.viewController = viewController
     router.viewController = viewController
     router.dataStore = interactor
@@ -115,22 +122,25 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
 //    inputViewToolBar.setItems([doneButton], animated: true)
 
 
-    doSomething()
+//    doSomething()
   }
   
   // MARK: Do something
   
   //@IBOutlet weak var nameTextField: UITextField!
   
-  func doSomething()
+  func performCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   {
-    let request = CurrencyConverter.FetchCurrencyConversion.Request(fromAmount: 340.51, fromCurrency: "EUR", toCurrency: "JPY")
     interactor?.fetchCurrencyConversion(request: request)
   }
   
-  func displaySomething(viewModel: CurrencyConverter.Something.ViewModel)
+  func displayCurrencyConversion(viewModel: CurrencyConverter.FetchCurrencyConversion.ViewModel)
   {
-    //nameTextField.text = viewModel.name
+    conversionSection.output?.textField?.text = viewModel.receive
+  }
+
+  func displayErrorAlert(viewModel: CurrencyConverter.ErrorAlert.ViewModel) {
+    Alert.showErrorAlert(on: self, title: viewModel.title, message: viewModel.message, buttonTitle: viewModel.buttonTitle, buttonHandler: nil, completion: nil)
   }
 
   private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
@@ -223,12 +233,22 @@ extension CurrencyConverterViewController: UICollectionViewDataSource {
         cell.inputTextField.inputView = currencyPickerView
         cell.inputTextField.inputAccessoryView = inputViewToolBar
 
-        
+        cell.inputTextField.delegate = self
+
+        // TODO: Fix this spagettoni, should be cell protocol of a button, with cell purpose enum like .input ;/
+        conversionSection.input?.textField = cell.inputTextField
+        conversionSection.input = (cell.inputTextField, cell.currencySelectionButton)
+
+        cell.currencySelectionButton.addTarget(self, action: #selector(currencyTypeSelectionButtonPressed(sender:)), for: .touchUpInside)
+
       }else if indexPath.row == 1 {
         cell.actionLabel.text("Receive")
         cell.actionImageView.image = UIImage(named: "currencyReceiveImage")
         cell.inputTextField.textColor = .systemGreen
         cell.inputTextField.isUserInteractionEnabled = false
+
+        cell.inputTextField.delegate = self
+        conversionSection.output = (cell.inputTextField, cell.currencySelectionButton)
       }
       
       return cell
@@ -266,7 +286,17 @@ extension CurrencyConverterViewController {
     if sender == v.submitButton {
       print("Submit button pressed!")
 
-//      self.v.bottomConstraint?.constant += idk
+      Alert.showBasicAlert(on: self,
+                           title: "Currency conversion",
+                           message: "Do you want to convert?",
+                           leftButtonTitle: "Cancel",
+                           rightButttonTitle: "Approve",
+                           leftButtonHandler: { alertAction in
+                            print("leftButtonPressed - Cancel!")
+                           }, rightButtonHandler: { alertAction in
+                            print("rightButtonPressed - Approve!")
+                           }, completion: nil)
+
 
       UIView.animate(withDuration: 0.1) {
         self.v.submitButtonBottomConstraint?.constant = idk
@@ -279,6 +309,17 @@ extension CurrencyConverterViewController {
         idk = -270
       }
     }
+  }
+
+  @objc func currencyTypeSelectionButtonPressed(sender: UIButton){
+    print("Currency Type button pressed!")
+  }
+}
+
+extension CurrencyConverterViewController: UITextFieldDelegate {
+  func textFieldDidChangeSelection(_ textField: UITextField) {
+    let request = CurrencyConverter.FetchCurrencyConversion.Request(fromAmount: textField.text ?? "", fromCurrency: "EUR", toCurrency: "USD")
+    performCurrencyConversion(request: request)
   }
 }
 
