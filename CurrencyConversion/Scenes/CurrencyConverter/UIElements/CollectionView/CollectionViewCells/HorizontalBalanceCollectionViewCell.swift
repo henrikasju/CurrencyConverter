@@ -13,6 +13,13 @@ class HorizontalBalanceCollectionViewCell: UICollectionViewCell {
       return "HorizontalBalanceCollectionViewCell"
   }
 
+  var viewModel: CurrencyConverter.CollectionView.ViewModel.BalanceCell! {
+    didSet {
+      currencyLabel.text = viewModel.currencyName
+      amountLabel.text = viewModel.holdingAmount
+    }
+  }
+
   let amountLabel = UILabel()
   let currencyLabel = UILabel()
   let horizontalStackView = UIStackView()
@@ -46,7 +53,6 @@ class HorizontalBalanceCollectionViewCell: UICollectionViewCell {
     amountLabel.font = localFont
     amountLabel.textColor = localFontColor
     amountLabel.backgroundColor = .clear
-
 
     backgroundColor = .clear
   }

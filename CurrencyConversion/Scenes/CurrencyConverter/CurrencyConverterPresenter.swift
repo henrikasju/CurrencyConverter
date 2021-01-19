@@ -12,10 +12,14 @@
 
 import UIKit
 import Alamofire
+import RealmSwift
 
 protocol CurrencyConverterPresentationLogic
 {
   func presentCurrencyConversion(response: CurrencyConverter.FetchCurrencyConversion.Response)
+  func presentBalanceCells(response: CurrencyConverter.CollectionView.Response.BalanceCell)
+  func presentCurrencyConversionContract(response: CurrencyConverter.FetchCurrencyConversionContract.Response)
+  func presentCompleteCurrencyConversionContract(response: CurrencyConverter.CompleteCurrencyConversionContract.Response)
 }
 
 class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
@@ -31,6 +35,13 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
       switch knownError {
       case .InvalidConversionInput :
         viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Invalid Conversion", message: "Invalid conversion input", buttonTitle: "Close")
+      case .DatabaseRequestedObjectNotExisting:
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Database issue", message: "Requested object from the database does not exist.", buttonTitle: "Close")
+      case .UnsuportedCurrencyRequest:
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Database issue", message: "Requested unsupported currency.", buttonTitle: "Close")
+      case .InsufficientConvertingFunds:
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Invalid Conversion", message: "Insufficient conversion funds", buttonTitle: "Close")
+
       }
     }else if let apiError = error as? AFError {
       viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Server issue", message: "Servers issues, please try again. (\(apiError.localizedDescription))", buttonTitle: "Close")
@@ -47,14 +58,85 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
       print("Display ERROR!!!!!")
       presentCurrencyConversionErrorAlert(error: error)
 
-    }else if let conversion = response.conversion, let fee = response.fee {
-      let feeString = NumberFormatter.localizedString(from: NSNumber(value: fee), number: .decimal)
-      let viewModel = CurrencyConverter.FetchCurrencyConversion.ViewModel(receive: "+ " + conversion.amount, fee: feeString)
+    }else if let conversion = response.conversion {
+//      let feeString = NumberFormatter.localizedString(from: NSNumber(value: fee), number: .decimal)
+      let viewModel = CurrencyConverter.FetchCurrencyConversion.ViewModel(receive: "+ " + conversion.amount)
 
       viewController?.displayCurrencyConversion(viewModel: viewModel)
     }
+  }
 
-//    let viewModel = CurrencyConverter.Something.ViewModel()
-//    viewController?.displaySomething(viewModel: viewModel)
+  func presentCurrencyConversionContract(response: CurrencyConverter.FetchCurrencyConversionContract.Response) {
+    if let error = response.error {
+      print("Display ERROR!!!!!")
+      presentCurrencyConversionErrorAlert(error: error)
+
+    }else if let fromAmount = response.fromAmount, let fromCurrency = response.fromCurrency,
+             let toAmount = response.toAmount, let toCurrency = response.toCurrency,
+             let feeRate = response.feeRate, let fee = response.fee,
+             let validRequest = response.validRequest, let totalAmount = response.totalAmount {
+
+      var message: String = ""
+      if validRequest {
+        message = String(format: "Do you wish to procced conversion from: %.2f %@ (without fee: %@ %@), to: %@ %@ with included fee of: %.2f %@ (%.2f%%)",
+                         totalAmount, fromCurrency, fromAmount, fromCurrency, toAmount, toCurrency, fee, fromCurrency, feeRate)
+      }else{
+        message = String(format: "Insufficient fund to procced conversion from: %.2f %@ (without fee: %@ %@), to: %@ %@ with included fee of: %.2f %@ (%.2f%%)",
+                         totalAmount, fromCurrency, fromAmount, fromCurrency, toAmount, toCurrency, fee, fromCurrency, feeRate)
+      }
+
+      let viewModel = CurrencyConverter.FetchCurrencyConversionContract.ViewModel(message: message, validRequest: validRequest)
+
+      viewController?.displayCurrencyConversionContract(viewModel: viewModel)
+    }
+  }
+
+  func presentCompleteCurrencyConversionContract(response: CurrencyConverter.CompleteCurrencyConversionContract.Response) {
+    if let error = response.error {
+      print("Display ERROR!!!!!")
+      presentCurrencyConversionErrorAlert(error: error)
+
+    }else if let totalAmount = response.totalAmount, let fromCurrency = response.fromCurrency,
+             let toAmount = response.toAmount, let toCurrency = response.toCurrency,
+             let fee = response.fee {
+
+      var message: String = String(format: "Successfully Converted: %.2f %@ (with fee: %.2f %@), to: %@ %@",
+                         totalAmount, fromCurrency, fee, fromCurrency, toAmount, toCurrency)
+
+      let viewModel = CurrencyConverter.CompleteCurrencyConversionContract.ViewModel(message: message)
+
+      viewController?.displayCompleteCurrencyConversionContract(viewModel: viewModel)
+    }
+//
+//      var message: String = ""
+//      if validRequest {
+//        message = String(format: "Do you wish to procced conversion from: %.2f %@ (without fee: %@ %@), to: %@ %@ with included fee of: %.2f %@ (%.2f%%)",
+//                         totalAmount, fromCurrency, fromAmount, fromCurrency, toAmount, toCurrency, fee, fromCurrency, feeRate)
+//      }else{
+//        message = String(format: "Insufficient fund to procced conversion from: %.2f %@ (without fee: %@ %@), to: %@ %@ with included fee of: %.2f %@ (%.2f%%)",
+//                         totalAmount, fromCurrency, fromAmount, fromCurrency, toAmount, toCurrency, fee, fromCurrency, feeRate)
+//      }
+//
+//      let viewModel = CurrencyConverter.FetchCurrencyConversionContract.ViewModel(message: message, validRequest: validRequest)
+//
+//      viewController?.displayCurrencyConversionContract(viewModel: viewModel)
+//    }
+  }
+
+  func presentBalanceCells(response: CurrencyConverter.CollectionView.Response.BalanceCell) {
+    if let error = response.error {
+      print("Display ERROR!!!!!")
+      presentCurrencyConversionErrorAlert(error: error)
+
+    }else if let storedCurrencies = response.objects {
+      let cellViewModels: [CurrencyConverter.CollectionView.ViewModel.BalanceCell] = storedCurrencies.map { (currency: StoredCurrency) -> CurrencyConverter.CollectionView.ViewModel.BalanceCell in
+        let holdingAmount = String(format: "%.2f", currency.holdingAmount)
+        let cellViewModel = CurrencyConverter.CollectionView.ViewModel.BalanceCell(currencyName: currency.name, holdingAmount: holdingAmount)
+        return cellViewModel
+      }
+
+      let viewModel = CurrencyConverter.CollectionView.ViewModel(displayedObjects: cellViewModels)
+      viewController?.displayCollectionViewBalances(viewModel: viewModel)
+    }
   }
 }

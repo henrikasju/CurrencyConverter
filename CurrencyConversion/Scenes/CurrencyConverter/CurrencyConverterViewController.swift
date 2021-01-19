@@ -17,6 +17,9 @@ protocol CurrencyConverterDisplayLogic: class
 {
   func displayCurrencyConversion(viewModel: CurrencyConverter.FetchCurrencyConversion.ViewModel)
   func displayErrorAlert(viewModel: CurrencyConverter.ErrorAlert.ViewModel)
+  func displayCollectionViewBalances(viewModel: CurrencyConverter.CollectionView.ViewModel?)
+  func displayCurrencyConversionContract(viewModel: CurrencyConverter.FetchCurrencyConversionContract.ViewModel)
+  func displayCompleteCurrencyConversionContract(viewModel: CurrencyConverter.CompleteCurrencyConversionContract.ViewModel)
 }
 
 class CurrencyConverterViewController: UIViewController, CurrencyConverterDisplayLogic
@@ -27,10 +30,18 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   private let v = CurrencyConverterView()
   override func loadView() { view = v }
 
-  private var conversionSection: (
-    input: (textField: UITextField?, currencySelectionButton: UIButton?)?,
-    output: (textField: UITextField?, currencySelectionButton: UIButton?)?
-  )
+  var balancesViewModels: [CurrencyConverter.CollectionView.ViewModel.BalanceCell] = []
+
+//  private var conversionSection: (
+//    input: (textField: UITextField?, currencySelectionButton: UIButton?)?,
+//    output: (textField: UITextField?, currencySelectionButton: UIButton?)?
+//  )
+
+  private var inputTextField: UITextField?
+  private var inputSelectionButton: UIButton?
+
+  private var outputTextField: UITextField?
+  private var outputSelectionButton: UIButton?
 
   private let currencyPickerView: UIPickerView = {
     let pickerView = UIPickerView()
@@ -72,6 +83,7 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
     viewController.router = router
     interactor.presenter = presenter
     interactor.currencyConversionWorker = CurrencyConversionWorker()
+    interactor.databaseWorker = DatabaseWorker()
     presenter.viewController = viewController
     router.viewController = viewController
     router.dataStore = interactor
@@ -118,29 +130,81 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
     v.submitButton.addTarget(self, action: #selector(submitButtonPressed(sender:)), for: .touchUpInside)
 
     let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.endEditing))
-    // BUG
-//    inputViewToolBar.setItems([doneButton], animated: true)
 
+    fetchCollectionViewModels(cellType: .Balance)
 
-//    doSomething()
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardUpdated(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardUpdated(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
   }
   
   // MARK: Do something
   
   //@IBOutlet weak var nameTextField: UITextField!
+
+  func fetchCollectionViewModels(cellType: CurrencyConverter.CollectionView.CellType) {
+    let request = CurrencyConverter.CollectionView.Request(type: cellType)
+    interactor?.fetchCollectionViewModels(request: request)
+  }
+
+  func displayCollectionViewBalances(viewModel: CurrencyConverter.CollectionView.ViewModel?) {
+    if viewModel != nil {
+      balancesViewModels = viewModel!.displayedObjects as! [CurrencyConverter.CollectionView.ViewModel.BalanceCell]
+    }
+    v.collectionView.reloadData()
+  }
   
-  func performCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
-  {
+  func performCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request) {
     interactor?.fetchCurrencyConversion(request: request)
   }
   
-  func displayCurrencyConversion(viewModel: CurrencyConverter.FetchCurrencyConversion.ViewModel)
-  {
-    conversionSection.output?.textField?.text = viewModel.receive
+  func displayCurrencyConversion(viewModel: CurrencyConverter.FetchCurrencyConversion.ViewModel) {
+    outputTextField?.text = viewModel.receive
   }
 
   func displayErrorAlert(viewModel: CurrencyConverter.ErrorAlert.ViewModel) {
-    Alert.showErrorAlert(on: self, title: viewModel.title, message: viewModel.message, buttonTitle: viewModel.buttonTitle, buttonHandler: nil, completion: nil)
+    Alert.showSingleButtonAlert(on: self, title: viewModel.title, message: viewModel.message, buttonTitle: viewModel.buttonTitle, buttonHandler: nil, completion: nil)
+  }
+
+  func fetchCurrencyConversionContract(request: CurrencyConverter.FetchCurrencyConversionContract.Request) {
+    interactor?.fetchCurrencyConversionContract(request: request)
+  }
+
+  func displayCurrencyConversionContract(viewModel: CurrencyConverter.FetchCurrencyConversionContract.ViewModel) {
+    if viewModel.validRequest {
+      // TODO: Alert text is poorly formated
+      Alert.showBasicAlert(on: self, title: "Convert Currency", message: viewModel.message, leftButtonTitle: "Cancel", rightButttonTitle: "Continue") { _ in
+        print("Cancelled")
+      } rightButtonHandler: { _ in
+        // Procced with currency conversion!
+        print("Convert Currency!")
+
+        let inputAmount = self.inputTextField?.text ?? ""
+        let fromCurrency = "EUR"
+        let toCurrency = "USD"
+
+        let request = CurrencyConverter.CompleteCurrencyConversionContract.Request(fromAmount: inputAmount, fromCurrency: fromCurrency, toCurrency: toCurrency)
+        self.CompleteCurrencyConversionContract(request: request)
+      } completion: {
+
+      }
+    }else {
+      // Currency conversioin is unavailable due to insufficient Funds
+      Alert.showSingleButtonAlert(on: self, title: "Convert Currency", message: "Insufficient Funds", buttonTitle: "Close", buttonHandler: nil, completion: nil)
+    }
+  }
+
+  func CompleteCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request) {
+    interactor?.CompleteCurrencyConversionContract(request: request)
+  }
+
+  func displayCompleteCurrencyConversionContract(viewModel: CurrencyConverter.CompleteCurrencyConversionContract.ViewModel) {
+    fetchCollectionViewModels(cellType: .Balance)
+    Alert.showSingleButtonAlert(on: self, title: "Currency Conversion", message: viewModel.message, buttonTitle: "Awesome!") { _ in
+
+    } completion: {
+
+    }
+
   }
 
   private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
@@ -200,7 +264,7 @@ extension CurrencyConverterViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     switch section {
     case 0:
-      return 9
+      return balancesViewModels.count
     case 1:
       return 2
     default:
@@ -218,7 +282,7 @@ extension CurrencyConverterViewController: UICollectionViewDataSource {
     let cell = collectionView.dequeueReusableCell( withReuseIdentifier: HorizontalBalanceCollectionViewCell.identifier,
                                                    for: indexPath) as? HorizontalBalanceCollectionViewCell {
 
-      cell.amountLabel.text(String(repeating: "0", count: indexPath.row) + "00.00")
+      cell.viewModel = balancesViewModels[indexPath.row]
 
       return cell
     } else if indexPath.section == 1,
@@ -229,15 +293,16 @@ extension CurrencyConverterViewController: UICollectionViewDataSource {
       if indexPath.row == 0 {
         cell.actionLabel.text("Sell")
         cell.actionImageView.image = UIImage(named: "currencySellImage")
+        cell.inputTextField.isUserInteractionEnabled = true
 
-        cell.inputTextField.inputView = currencyPickerView
-        cell.inputTextField.inputAccessoryView = inputViewToolBar
+//        cell.inputTextField.inputView = currencyPickerView
+//        cell.inputTextField.inputAccessoryView = inputViewToolBar
 
         cell.inputTextField.delegate = self
 
         // TODO: Fix this spagettoni, should be cell protocol of a button, with cell purpose enum like .input ;/
-        conversionSection.input?.textField = cell.inputTextField
-        conversionSection.input = (cell.inputTextField, cell.currencySelectionButton)
+        inputTextField = cell.inputTextField
+        inputSelectionButton = cell.currencySelectionButton
 
         cell.currencySelectionButton.addTarget(self, action: #selector(currencyTypeSelectionButtonPressed(sender:)), for: .touchUpInside)
 
@@ -248,7 +313,8 @@ extension CurrencyConverterViewController: UICollectionViewDataSource {
         cell.inputTextField.isUserInteractionEnabled = false
 
         cell.inputTextField.delegate = self
-        conversionSection.output = (cell.inputTextField, cell.currencySelectionButton)
+        outputTextField = cell.inputTextField
+        outputSelectionButton = cell.currencySelectionButton
       }
       
       return cell
@@ -277,8 +343,6 @@ extension CurrencyConverterViewController: UICollectionViewDataSource {
   }
 }
 
-var idk: CGFloat = -270
-
 //MARK: - UIButton Targets
 extension CurrencyConverterViewController {
 
@@ -286,28 +350,12 @@ extension CurrencyConverterViewController {
     if sender == v.submitButton {
       print("Submit button pressed!")
 
-      Alert.showBasicAlert(on: self,
-                           title: "Currency conversion",
-                           message: "Do you want to convert?",
-                           leftButtonTitle: "Cancel",
-                           rightButttonTitle: "Approve",
-                           leftButtonHandler: { alertAction in
-                            print("leftButtonPressed - Cancel!")
-                           }, rightButtonHandler: { alertAction in
-                            print("rightButtonPressed - Approve!")
-                           }, completion: nil)
+      let inputAmount = inputTextField?.text ?? ""
+      let fromCurrency = "EUR"
+      let toCurrency = "USD"
 
-
-      UIView.animate(withDuration: 0.1) {
-        self.v.submitButtonBottomConstraint?.constant = idk
-        self.v.layoutIfNeeded()
-      }
-
-      if idk == -270 {
-        idk = 0
-      }else{
-        idk = -270
-      }
+      let request = CurrencyConverter.FetchCurrencyConversionContract.Request(fromAmount: inputAmount, fromCurrency: fromCurrency, toCurrency: toCurrency)
+      fetchCurrencyConversionContract(request: request)
     }
   }
 
@@ -340,5 +388,32 @@ extension CurrencyConverterViewController: UIPickerViewDataSource {
 
   func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
     return "Title - " + String(row)
+  }
+}
+
+//MARK: - Keyboard management
+extension CurrencyConverterViewController {
+  // TODO: make keyboard disapear in some way!
+  
+  @objc func keyboardUpdated(notification: Notification){
+    if let userInfo = notification.userInfo,
+       let keyboardSize = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+       let animationDuration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double),
+       let animationCurve = (userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber)?.uintValue {
+
+      var bottomInset: CGFloat = 0.0
+
+      if notification.name == UIResponder.keyboardWillShowNotification {
+        bottomInset = -keyboardSize.height
+      }else if notification.name == UIResponder.keyboardWillHideNotification {
+        bottomInset = 0
+      }
+
+      let curveAnimationOptions = UIView.AnimationOptions(rawValue: animationCurve << 16)
+      UIView.animate(withDuration: animationDuration, delay: 0, options: curveAnimationOptions, animations: {
+        self.v.submitButton.bottomConstraint?.constant = bottomInset
+        self.v.layoutIfNeeded()
+      }, completion: nil)
+    }
   }
 }

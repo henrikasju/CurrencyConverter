@@ -12,10 +12,14 @@
 
 import UIKit
 import Alamofire
+import RealmSwift
 
 protocol CurrencyConverterBusinessLogic
 {
   func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
+  func fetchCollectionViewModels(request: CurrencyConverter.CollectionView.Request)
+  func fetchCurrencyConversionContract(request: CurrencyConverter.FetchCurrencyConversionContract.Request)
+  func CompleteCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request)
 }
 
 protocol CurrencyConverterDataStore
@@ -28,12 +32,12 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
   var presenter: CurrencyConverterPresentationLogic?
   var worker: CurrencyConversionWorker?
   var currencyConversionWorker: CurrencyConversionWorker?
+  var databaseWorker: DatabaseWorker?
+  let numberFormatter = NumberFormatter()
 
   func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   {
-    // validate request!
-    let numberFormatter = NumberFormatter()
-    if numberFormatter.number(from: request.fromAmount)?.doubleValue == nil {
+    if !validateConversionInputValue(inputValue: request.fromAmount) {
       print("Error invalid number format!")
       let response = CurrencyConverter.FetchCurrencyConversion.Response(error: ErrorType.InvalidConversionInput)
       presenter?.presentCurrencyConversion(response: response)
@@ -46,7 +50,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
       { response in
         switch response.result {
         case .success:
-          let conversion = CurrencyConverter.FetchCurrencyConversion.Response(conversion: response.value, fee: 0.00)
+          let conversion = CurrencyConverter.FetchCurrencyConversion.Response(conversion: response.value)
           self.presenter?.presentCurrencyConversion(response: conversion)
         case let .failure(error):
           let conversion = CurrencyConverter.FetchCurrencyConversion.Response(error: error)
@@ -54,6 +58,171 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
         }
       })
 
+  }
+
+  private func validateConversionInputValue(inputValue: String) -> Bool {
+    let value: Double? = numberFormatter.number(from: inputValue)?.doubleValue
+    return (value == nil ? false : (value! <= 0 ? false : true) )
+  }
+
+  func fetchCollectionViewModels(request: CurrencyConverter.CollectionView.Request) {
+
+    switch request.type {
+    case .Balance:
+      var response: CurrencyConverter.CollectionView.Response.BalanceCell
+
+      let storedCurrency = databaseWorker?.getAllStoredCurrencies()
+      if let objects = storedCurrency {
+        response = CurrencyConverter.CollectionView.Response.BalanceCell(objects: objects)
+      }else{
+        response = CurrencyConverter.CollectionView.Response.BalanceCell(error: ErrorType.DatabaseRequestedObjectNotExisting)
+      }
+
+      presenter?.presentBalanceCells(response: response)
     }
-  
+  }
+
+  func fetchCurrencyConversionContract(request: CurrencyConverter.FetchCurrencyConversionContract.Request) {
+
+    if !validateConversionInputValue(inputValue: request.fromAmount) {
+      print("Error invalid number format!")
+      let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput)
+      presenter?.presentCurrencyConversionContract(response: response)
+    }
+
+      currencyConversionWorker?.fetchConvertedCurrency(fromAmount: request.fromAmount,
+                                                       fromCurrency: request.fromCurrency,
+                                                       toCurrency: request.toCurrency,
+                                                       completion:
+      { response in
+        switch response.result {
+        case .success:
+          // Calculating fee
+          let inputAmount = self.numberFormatter.number(from: request.fromAmount)!.doubleValue
+          let feeRate = self.calculateConversionFee()
+          let fee = inputAmount * feeRate
+
+          // Gathering stored converting currency
+          let fromStoredCurrency = self.databaseWorker?.getStoredCurrency(name: request.fromCurrency)
+
+          if let fromCurrentCurrency = fromStoredCurrency {
+            // Calculating required total amount for conversion
+            let requiredTotalAmount = inputAmount * (1 + feeRate)
+            let validConversion = requiredTotalAmount <= fromCurrentCurrency.holdingAmount
+
+            let response = CurrencyConverter.FetchCurrencyConversionContract.Response(fromAmount: request.fromAmount ,totalAmount: requiredTotalAmount, fromCurrency: request.fromCurrency, toCurrency: request.toCurrency, toAmount: response.value!.amount, feeRate: feeRate*100, fee: fee, validRequest: validConversion)
+            self.presenter?.presentCurrencyConversionContract(response: response)
+            
+          }else{
+            // TODO: Unable to receive currency from DB
+            let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest)
+            self.presenter?.presentCurrencyConversionContract(response: response)
+          }
+
+        case let .failure(error):
+          let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: error)
+          self.presenter?.presentCurrencyConversionContract(response: response)
+        }
+      })
+  }
+
+  func CompleteCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request) {
+    if !validateConversionInputValue(inputValue: request.fromAmount) {
+      print("Error invalid number format!")
+      let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput)
+      presenter?.presentCompleteCurrencyConversionContract(response: response)
+    }
+
+      currencyConversionWorker?.fetchConvertedCurrency(fromAmount: request.fromAmount,
+                                                       fromCurrency: request.fromCurrency,
+                                                       toCurrency: request.toCurrency,
+                                                       completion:
+      { response in
+        switch response.result {
+        case .success:
+          // Calculating fee
+          let inputAmount = self.numberFormatter.number(from: request.fromAmount)!.doubleValue
+          let outputAmount = self.numberFormatter.number(from: response.value!.amount)!.doubleValue
+          let feeRate = self.calculateConversionFee()
+          let fee = inputAmount * feeRate
+
+          // Gathering stored converting currency
+          let fromStoredCurrency = self.databaseWorker?.getStoredCurrency(name: request.fromCurrency)
+          let toStoredCurrency = self.databaseWorker?.getStoredCurrency(name: response.value!.currency)
+
+          if let fromCurrentCurrency = fromStoredCurrency, let toCurrentCurrency = toStoredCurrency {
+            // Calculating required total amount for conversion
+            let requiredTotalAmount = inputAmount * (1 + feeRate)
+            let validConversion = requiredTotalAmount <= fromCurrentCurrency.holdingAmount
+
+            if !validConversion {
+              // Error invalid request, funds are not sufficient
+              let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InsufficientConvertingFunds)
+              self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+              
+            }else{
+              let transaction: ConvertedCurrencyTransaction = {
+                let transaction = ConvertedCurrencyTransaction()
+                transaction.fromCurrency = request.fromCurrency
+                transaction.fromAmount.value = inputAmount
+                transaction.fromTotalAmount.value = requiredTotalAmount
+                transaction.feeRate.value = feeRate
+                transaction.feeAmount.value = fee
+                transaction.toCurrency = response.value!.currency
+                transaction.toAmount.value = outputAmount
+
+                return transaction
+              }()
+
+              // Saving transaction
+              self.databaseWorker?.addConvertedCurrencyTransaction(object: transaction) { error in
+                let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: error)
+                self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+              }
+
+              // Converting funds
+              let updatedFromCurrentCurrency: StoredCurrency = {
+                let storedCurrency = StoredCurrency()
+                storedCurrency.name = fromCurrentCurrency.name
+                storedCurrency.holdingAmount = fromCurrentCurrency.holdingAmount - requiredTotalAmount
+
+                return storedCurrency
+              }()
+
+              let updatedToCurrentCurrency: StoredCurrency = {
+                let storedCurrency = StoredCurrency()
+                storedCurrency.name = toCurrentCurrency.name
+                storedCurrency.holdingAmount = toCurrentCurrency.holdingAmount + outputAmount
+
+                return storedCurrency
+              }()
+
+              self.databaseWorker?.updateStoredCurrencies(objects: [updatedFromCurrentCurrency, updatedToCurrentCurrency]) { error in
+                let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: error)
+                self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+              }
+
+              let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(totalAmount: requiredTotalAmount, fromCurrency: request.fromCurrency, toCurrency: response.value!.currency, toAmount: response.value!.amount, fee: fee)
+
+              self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+            }
+
+
+          }else{
+            // TODO: Unable to receive currency from DB
+            let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest)
+            self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+          }
+
+        case let .failure(error):
+          let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: error)
+          self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+        }
+      })
+  }
+
+  private func calculateConversionFee() -> Double {
+    return 0.07
+  }
+
 }

@@ -12,7 +12,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        return true
+      let defaults = UserDefaults.standard
+      let databaseWorker = DatabaseWorker()
+
+      let launchedBefore = defaults.bool(forKey: "launchedBefore")
+      if !launchedBefore {
+
+        let euros: StoredCurrency = {
+          let currency = StoredCurrency()
+          currency.name = "EUR"
+          currency.holdingAmount = 1000
+          return currency
+        }()
+
+        let dollars: StoredCurrency = {
+          let currency = StoredCurrency()
+          currency.name = "USD"
+          currency.holdingAmount = 0
+          return currency
+        }()
+
+        let yens: StoredCurrency = {
+          let currency = StoredCurrency()
+          currency.name = "JPY"
+          currency.holdingAmount = 0
+          return currency
+        }()
+
+        databaseWorker.addStoredCurrencies(objects: [euros, dollars, yens]) { error in
+          fatalError("Issues with database!, \(String(describing: error?.localizedDescription))")
+        }
+        defaults.set(true, forKey: "launchedBefore")
+      }
+
+      return true
     }
 
     // MARK: UISceneSession Lifecycle

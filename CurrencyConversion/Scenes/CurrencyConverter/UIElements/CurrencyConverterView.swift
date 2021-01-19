@@ -20,8 +20,6 @@ class CurrencyConverterView: UIView {
   let localFont = UIFont.systemFont(ofSize: 18, weight: .medium)
   let localFontColor = UIColor(named: "backgroundColor")
 
-  var submitButtonBottomConstraint: NSLayoutConstraint!
-
   convenience init() {
     self.init(frame: .zero)
 
@@ -38,7 +36,7 @@ class CurrencyConverterView: UIView {
     submitButton.backgroundColor = UIColor(named: "secondaryColor")
     submitButton.left(12).right(12)
     submitButton.height(50)
-    submitButtonBottomConstraint = submitButton.Bottom == safeAreaLayoutGuide.Bottom
+    submitButton.Bottom == safeAreaLayoutGuide.Bottom
     submitButton.layer.cornerRadius = 25
 
     collectionView.Left == Left

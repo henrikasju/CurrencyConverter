@@ -12,60 +12,101 @@
 
 import UIKit
 import Alamofire
+import RealmSwift
+
+protocol DisplayedObject {
+
+}
 
 enum ErrorType: Error {
   case InvalidConversionInput
+  case DatabaseRequestedObjectNotExisting
+  case UnsuportedCurrencyRequest
+  case InsufficientConvertingFunds
 }
 
-enum CurrencyConverter
-{
+enum CurrencyConverter {
   // MARK: Use cases
   
-  enum FetchCurrencyConversion
-  {
-    struct Request
-    {
+  enum FetchCurrencyConversion {
+    struct Request {
       var fromAmount: String
       var fromCurrency: String
       var toCurrency: String
     }
 
-    struct Response
-    {
+    struct Response {
       var conversion: ConvertedCurrency?
+      var error: Error?
+    }
+
+    struct ViewModel {
+      var receive: String
+    }
+  }
+
+  enum FetchCurrencyConversionContract {
+    struct Request {
+      var fromAmount: String
+      var fromCurrency: String
+      var toCurrency: String
+    }
+
+    struct Response {
+      var fromAmount: String?
+      var totalAmount: Double?
+      var fromCurrency: String?
+      var toCurrency: String?
+      var toAmount: String?
+      var feeRate: Double?
+      var fee: Double?
+      var validRequest: Bool?
+      var error: Error?
+    }
+
+    struct ViewModel {
+      var message: String
+      var validRequest: Bool
+    }
+  }
+
+  enum CompleteCurrencyConversionContract {
+    struct Request {
+      var fromAmount: String
+      var fromCurrency: String
+      var toCurrency: String
+    }
+
+    struct Response {
+      var totalAmount: Double?
+      var fromCurrency: String?
+      var toCurrency: String?
+      var toAmount: String?
       var fee: Double?
       var error: Error?
     }
 
-    struct ViewModel
-    {
-      var receive: String
-      var fee: String
+    struct ViewModel {
+      var message: String
     }
   }
 
-  enum ErrorAlert
-  {
-
-    struct Request
-    {
+  enum ErrorAlert {
+    struct Request {
     }
 
-    struct Response
-    {
+    struct Response {
       var error: Error
     }
 
-    struct ViewModel
-    {
+    struct ViewModel {
       var title: String
       var message: String
       var buttonTitle: String
     }
   }
 
-  enum Something
-  {
+  enum Something {
     struct Request
     {
     }
@@ -76,6 +117,32 @@ enum CurrencyConverter
 
     struct ViewModel
     {
+    }
+  }
+
+  enum CollectionView {
+    enum CellType {
+      case Balance
+    }
+
+    struct Request {
+      var type: CellType
+    }
+
+    struct Response {
+      struct BalanceCell {
+        var objects: Results<StoredCurrency>?
+        var error: Error?
+      }
+    }
+
+    struct ViewModel {
+      struct BalanceCell: DisplayedObject {
+        var currencyName: String
+        var holdingAmount: String
+      }
+
+      var displayedObjects: [DisplayedObject]
     }
   }
 }

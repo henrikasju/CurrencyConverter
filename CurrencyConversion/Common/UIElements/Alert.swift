@@ -33,7 +33,7 @@ struct Alert {
     vc.present(alert, animated: true, completion: completion)
   }
 
-  static func showErrorAlert(on vc: UIViewController,
+  static func showSingleButtonAlert(on vc: UIViewController,
                                      title: String,
                                      message: String,
                                      buttonTitle: String,
