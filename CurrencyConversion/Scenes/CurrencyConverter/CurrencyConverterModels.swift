@@ -18,11 +18,26 @@ protocol DisplayedObject {
 
 }
 
-enum ErrorType: Error {
-  case InvalidConversionInput
-  case DatabaseRequestedObjectNotExisting
-  case UnsuportedCurrencyRequest
-  case InsufficientConvertingFunds
+enum ErrorType: LocalizedError {
+  case InvalidConversionInput(message: String? = nil)
+  case DatabaseRequestedObjectNotExisting(message: String? = nil)
+  case UnsuportedCurrencyRequest(message: String? = nil)
+  case InsufficientConvertingFunds(message: String)
+}
+
+extension ErrorType {
+  var errorDescription: String? {
+    switch self {
+    case let .InsufficientConvertingFunds(message):
+      return message
+    case let .InvalidConversionInput(message):
+      return message
+    case let .DatabaseRequestedObjectNotExisting(message):
+      return message
+    case let .UnsuportedCurrencyRequest(message):
+      return message
+    }
+  }
 }
 
 enum CurrencyConverter {
@@ -60,13 +75,11 @@ enum CurrencyConverter {
       var toAmount: String?
       var feeRate: Double?
       var fee: Double?
-      var validRequest: Bool?
       var error: Error?
     }
 
     struct ViewModel {
       var message: String
-      var validRequest: Bool
     }
   }
 

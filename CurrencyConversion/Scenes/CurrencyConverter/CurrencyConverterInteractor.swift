@@ -39,7 +39,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
   {
     if !validateConversionInputValue(inputValue: request.fromAmount) {
       print("Error invalid number format!")
-      let response = CurrencyConverter.FetchCurrencyConversion.Response(error: ErrorType.InvalidConversionInput)
+      let response = CurrencyConverter.FetchCurrencyConversion.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCurrencyConversion(response: response)
     }
 
@@ -75,7 +75,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
       if let objects = storedCurrency {
         response = CurrencyConverter.CollectionView.Response.BalanceCell(objects: objects)
       }else{
-        response = CurrencyConverter.CollectionView.Response.BalanceCell(error: ErrorType.DatabaseRequestedObjectNotExisting)
+        response = CurrencyConverter.CollectionView.Response.BalanceCell(error: ErrorType.DatabaseRequestedObjectNotExisting())
       }
 
       presenter?.presentBalanceCells(response: response)
@@ -86,7 +86,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
 
     if !validateConversionInputValue(inputValue: request.fromAmount) {
       print("Error invalid number format!")
-      let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput)
+      let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCurrencyConversionContract(response: response)
     }
 
@@ -112,12 +112,21 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
             let requiredTotalAmount = inputAmount * (1 + feeRate)
             let validConversion = requiredTotalAmount <= fromCurrentCurrency.holdingAmount
 
-            let response = CurrencyConverter.FetchCurrencyConversionContract.Response(fromAmount: request.fromAmount ,totalAmount: requiredTotalAmount, fromCurrency: request.fromCurrency, toCurrency: request.toCurrency, toAmount: response.value!.amount, feeRate: feeRate*100, fee: fee, validRequest: validConversion)
-            self.presenter?.presentCurrencyConversionContract(response: response)
+            if !validConversion {
+              // Error invalid request, funds are not sufficient
+              let error = ErrorType.InsufficientConvertingFunds(message: String(format: "Converting amount: %@ %@ to %@ %@, requires additional %.2f %@ as fee. Total required amount: %.2f %@",
+                                                                                request.fromAmount, request.fromCurrency, response.value!.amount,
+                                                                                response.value!.currency, fee, request.fromCurrency, requiredTotalAmount, request.fromCurrency ))
+              let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: error)
+              self.presenter?.presentCompleteCurrencyConversionContract(response: response)
+            }else {
+              let response = CurrencyConverter.FetchCurrencyConversionContract.Response(fromAmount: request.fromAmount ,totalAmount: requiredTotalAmount, fromCurrency: request.fromCurrency, toCurrency: request.toCurrency, toAmount: response.value!.amount, feeRate: feeRate*100, fee: fee)
+              self.presenter?.presentCurrencyConversionContract(response: response)
+            }
             
           }else{
             // TODO: Unable to receive currency from DB
-            let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest)
+            let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest())
             self.presenter?.presentCurrencyConversionContract(response: response)
           }
 
@@ -131,7 +140,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
   func CompleteCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request) {
     if !validateConversionInputValue(inputValue: request.fromAmount) {
       print("Error invalid number format!")
-      let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput)
+      let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCompleteCurrencyConversionContract(response: response)
     }
 
@@ -161,9 +170,11 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
 
             if !validConversion {
               // Error invalid request, funds are not sufficient
-              let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InsufficientConvertingFunds)
+              let error = ErrorType.InsufficientConvertingFunds(message: String(format: "Converting amount: %@ %@ to %@ %@, requires additional %.2f %@ as fee. Total required amount: %.2f %@",
+                                                                                request.fromAmount, request.fromCurrency, response.value!.amount,
+                                                                                response.value!.currency, fee, request.fromCurrency, requiredTotalAmount, request.fromCurrency ))
+              let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: error)
               self.presenter?.presentCompleteCurrencyConversionContract(response: response)
-              
             }else{
               let transaction: ConvertedCurrencyTransaction = {
                 let transaction = ConvertedCurrencyTransaction()
@@ -214,7 +225,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
 
           }else{
             // TODO: Unable to receive currency from DB
-            let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest)
+            let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest())
             self.presenter?.presentCompleteCurrencyConversionContract(response: response)
           }
 

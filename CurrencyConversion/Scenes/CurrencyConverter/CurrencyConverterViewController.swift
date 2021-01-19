@@ -129,7 +129,7 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
 
     v.submitButton.addTarget(self, action: #selector(submitButtonPressed(sender:)), for: .touchUpInside)
 
-    let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.endEditing))
+//    let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(self.endEditing))
 
     fetchCollectionViewModels(cellType: .Balance)
 
@@ -170,26 +170,21 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   }
 
   func displayCurrencyConversionContract(viewModel: CurrencyConverter.FetchCurrencyConversionContract.ViewModel) {
-    if viewModel.validRequest {
-      // TODO: Alert text is poorly formated
-      Alert.showBasicAlert(on: self, title: "Convert Currency", message: viewModel.message, leftButtonTitle: "Cancel", rightButttonTitle: "Continue") { _ in
-        print("Cancelled")
-      } rightButtonHandler: { _ in
-        // Procced with currency conversion!
-        print("Convert Currency!")
+    // TODO: Alert text is poorly formated
+    Alert.showBasicAlert(on: self, title: "Convert Currency", message: viewModel.message, leftButtonTitle: "Cancel", rightButttonTitle: "Continue") { _ in
+      print("Cancelled")
+    } rightButtonHandler: { _ in
+      // Procced with currency conversion!
+      print("Convert Currency!")
 
-        let inputAmount = self.inputTextField?.text ?? ""
-        let fromCurrency = "EUR"
-        let toCurrency = "USD"
+      let inputAmount = self.inputTextField?.text ?? ""
+      let fromCurrency = "EUR"
+      let toCurrency = "USD"
 
-        let request = CurrencyConverter.CompleteCurrencyConversionContract.Request(fromAmount: inputAmount, fromCurrency: fromCurrency, toCurrency: toCurrency)
-        self.CompleteCurrencyConversionContract(request: request)
-      } completion: {
+      let request = CurrencyConverter.CompleteCurrencyConversionContract.Request(fromAmount: inputAmount, fromCurrency: fromCurrency, toCurrency: toCurrency)
+      self.CompleteCurrencyConversionContract(request: request)
+    } completion: {
 
-      }
-    }else {
-      // Currency conversioin is unavailable due to insufficient Funds
-      Alert.showSingleButtonAlert(on: self, title: "Convert Currency", message: "Insufficient Funds", buttonTitle: "Close", buttonHandler: nil, completion: nil)
     }
   }
 
