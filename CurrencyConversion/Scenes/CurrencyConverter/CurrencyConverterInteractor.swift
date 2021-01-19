@@ -99,7 +99,9 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
         case .success:
           // Calculating fee
           let inputAmount = self.numberFormatter.number(from: request.fromAmount)!.doubleValue
-          let feeRate = self.calculateConversionFee()
+          let taxVisitor: TaxVisitor = FlatRateTaxVisitor()
+          let conversionTax = self.calculateConversionFee(visitor: taxVisitor)
+          let feeRate = conversionTax.rate
           let fee = inputAmount * feeRate
 
           // Gathering stored converting currency
@@ -143,7 +145,9 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
           // Calculating fee
           let inputAmount = self.numberFormatter.number(from: request.fromAmount)!.doubleValue
           let outputAmount = self.numberFormatter.number(from: response.value!.amount)!.doubleValue
-          let feeRate = self.calculateConversionFee()
+          let taxVisitor: TaxVisitor = FlatRateTaxVisitor()
+          let conversionTax = self.calculateConversionFee(visitor: taxVisitor)
+          let feeRate = conversionTax.rate
           let fee = inputAmount * feeRate
 
           // Gathering stored converting currency
@@ -221,8 +225,12 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
       })
   }
 
-  private func calculateConversionFee() -> Double {
-    return 0.07
+  private func calculateConversionFee(visitor: TaxVisitor) -> ConversionTax {
+    let conversionTax = ConversionTax(rate: 0.0)
+    // Tax visitor contains all business logic on tax computation
+    conversionTax.accept(visitor: visitor)
+
+    return conversionTax
   }
 
 }
