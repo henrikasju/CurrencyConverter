@@ -12,6 +12,7 @@
 		363934FD25B71A8200C6D36A /* Tax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363934FC25B71A8200C6D36A /* Tax.swift */; };
 		3639350125B71BF000C6D36A /* ConversionTax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3639350025B71BF000C6D36A /* ConversionTax.swift */; };
 		3639350525B71CB700C6D36A /* FlatRateTaxVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3639350425B71CB700C6D36A /* FlatRateTaxVisitor.swift */; };
+		3639350925B7512500C6D36A /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 3639350825B7512500C6D36A /* Swinject */; };
 		363C648A25AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363C648925AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift */; };
 		36784D5B25ACB22E002B05ED /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 36784D5A25ACB22E002B05ED /* Alamofire */; };
 		36784D5F25ACBD6B002B05ED /* ConvertedCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36784D5E25ACBD6B002B05ED /* ConvertedCurrency.swift */; };
@@ -74,6 +75,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3697A45E25B1F314008E2319 /* RealmSwift in Frameworks */,
+				3639350925B7512500C6D36A /* Swinject in Frameworks */,
 				3697A45C25B1F314008E2319 /* Realm in Frameworks */,
 				36838CF725A9FBB800AE937B /* Stevia in Frameworks */,
 				36784D5B25ACB22E002B05ED /* Alamofire in Frameworks */,
@@ -249,6 +251,7 @@
 				36784D5A25ACB22E002B05ED /* Alamofire */,
 				3697A45B25B1F314008E2319 /* Realm */,
 				3697A45D25B1F314008E2319 /* RealmSwift */,
+				3639350825B7512500C6D36A /* Swinject */,
 			);
 			productName = CurrencyConversion;
 			productReference = 369A38EF25A9D5290052981F /* CurrencyConversion.app */;
@@ -281,6 +284,7 @@
 				36838CF525A9FBB800AE937B /* XCRemoteSwiftPackageReference "Stevia" */,
 				36784D5925ACB22D002B05ED /* XCRemoteSwiftPackageReference "Alamofire" */,
 				3697A45A25B1F314008E2319 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
+				3639350725B7512500C6D36A /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			productRefGroup = 369A38F025A9D5290052981F /* Products */;
 			projectDirPath = "";
@@ -527,6 +531,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3639350725B7512500C6D36A /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.1;
+			};
+		};
 		36784D5925ACB22D002B05ED /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -554,6 +566,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3639350825B7512500C6D36A /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3639350725B7512500C6D36A /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
 		36784D5A25ACB22E002B05ED /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 36784D5925ACB22D002B05ED /* XCRemoteSwiftPackageReference "Alamofire" */;
