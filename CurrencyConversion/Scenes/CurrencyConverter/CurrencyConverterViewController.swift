@@ -56,58 +56,14 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
 
     return toolBar
   }()
-
-  // MARK: Object lifecycle
-  
-  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
-  {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-  }
-  
-  required init?(coder aDecoder: NSCoder)
-  {
-    super.init(coder: aDecoder)
-  }
-
-  // MARK: Setup
-  
-//  private func setup()
-//  {
-//    let viewController = self
-//    let interactor = CurrencyConverterInteractor()
-//    let presenter = CurrencyConverterPresenter()
-//    let router = CurrencyConverterRouter()
-//    viewController.interactor = interactor
-//    viewController.router = router
-//    interactor.presenter = presenter
-//    interactor.currencyConversionWorker = CurrencyConversionWorker()
-//    interactor.databaseWorker = DatabaseWorker()
-//    presenter.viewController = viewController
-//    router.viewController = viewController
-//    router.dataStore = interactor
-//  }
-  
-  // MARK: Routing
-  
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?)
-  {
-    if let scene = segue.identifier {
-      let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
-      if let router = router, router.responds(to: selector) {
-        router.perform(selector, with: segue)
-      }
-    }
-  }
-
-  override func viewWillAppear(_ animated: Bool) {
-    navigationItem.title = "Currency converter"
-  }
   
   // MARK: View lifecycle
   
   override func viewDidLoad()
   {
     super.viewDidLoad()
+
+    navigationItem.title = "Currency converter"
 
     v.collectionView.collectionViewLayout = createCompositionalLayout()
     v.collectionView.dataSource = self
