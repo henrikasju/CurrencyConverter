@@ -29,11 +29,17 @@ protocol CurrencyConverterDataStore
 
 class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConverterDataStore
 {
-  var presenter: CurrencyConverterPresentationLogic?
-  var worker: CurrencyConversionWorker?
-  var currencyConversionWorker: CurrencyConversionWorker?
-  var databaseWorker: DatabaseWorker?
+  var presenter: CurrencyConverterPresentationLogic!
+//  var worker: CurrencyConversionWorker?
+  var currencyConversionWorker: CurrencyConversionWorker!
+  var databaseWorker: DatabaseWorker!
   let numberFormatter = NumberFormatter()
+
+  init(presenter: CurrencyConverterPresentationLogic, currencyConversionWorker: CurrencyConversionWorker, databaseWorker: DatabaseWorker) {
+    self.presenter = presenter
+    self.currencyConversionWorker = currencyConversionWorker
+    self.databaseWorker = databaseWorker
+  }
 
   func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   {

@@ -6,22 +6,88 @@
 //
 
 import UIKit
+import Swinject
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
-    var window: UIWindow?
+  var window: UIWindow?
+  var container = Container()
 
+  func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    guard let windowScene = (scene as? UIWindowScene) else { return }
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-      guard let windowScene = (scene as? UIWindowScene) else { return }
+    window = UIWindow(windowScene: windowScene)
+    registerDependencies()
+    initialLaunchSetup()
 
-      window = UIWindow(windowScene: windowScene)
-      let rootVC = UINavigationController(rootViewController: CurrencyConverterViewController())
+    let vc = container.resolve(CurrencyConverterViewController.self)!
+    let rootVC = UINavigationController(rootViewController: vc)
 
-      window?.rootViewController = rootVC
-      setupNavigationBarAppearance()
-      window?.makeKeyAndVisible()
+    window?.rootViewController = rootVC
+    setupNavigationBarAppearance()
+    window?.makeKeyAndVisible()
+  }
+
+  private func initialLaunchSetup() {
+    let defaults = UserDefaults.standard
+    let databaseWorker = container.resolve(DatabaseWorker.self)
+
+    let launchedBefore = defaults.bool(forKey: "launchedBefore")
+    if !launchedBefore {
+
+      let euros: StoredCurrency = {
+        let currency = StoredCurrency()
+        currency.name = "EUR"
+        currency.holdingAmount = 1000
+        return currency
+      }()
+
+      let dollars: StoredCurrency = {
+        let currency = StoredCurrency()
+        currency.name = "USD"
+        currency.holdingAmount = 0
+        return currency
+      }()
+
+      let yens: StoredCurrency = {
+        let currency = StoredCurrency()
+        currency.name = "JPY"
+        currency.holdingAmount = 0
+        return currency
+      }()
+
+      databaseWorker?.addStoredCurrencies(objects: [euros, dollars, yens]) { error in
+        fatalError("Issues with database!, \(String(describing: error?.localizedDescription))")
+      }
+      defaults.set(true, forKey: "launchedBefore")
     }
+  }
+
+  private func registerDependencies() {
+    container.register(CurrencyConversionWorker.self) { _ in
+      CurrencyConversionWorker()
+    }
+    container.register(DatabaseWorker.self) { _ in
+      DatabaseWorker()
+    }
+    container.register(CurrencyConverterPresenter.self) { _ in CurrencyConverterPresenter() }
+      .initCompleted { resolver, presenter in
+        presenter.viewController = resolver.resolve(CurrencyConverterViewController.self)
+      }
+    container.register(CurrencyConverterInteractor.self) { resolver in
+      let currencyConversionWorker = resolver.resolve(CurrencyConversionWorker.self)!
+      let databaseWorker = resolver.resolve(DatabaseWorker.self)!
+      let presenter = resolver.resolve(CurrencyConverterPresenter.self)!
+
+      return CurrencyConverterInteractor(presenter: presenter, currencyConversionWorker: currencyConversionWorker, databaseWorker: databaseWorker)
+    }
+    container.register(CurrencyConverterViewController.self) { resolver in
+      let vc = CurrencyConverterViewController()
+      vc.interactor = resolver.resolve(CurrencyConverterInteractor.self)
+
+      return vc
+    }
+  }
 
   func setupNavigationBarAppearance() {
     let appearance = UINavigationBarAppearance()
@@ -64,7 +130,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
-
-
 }
 

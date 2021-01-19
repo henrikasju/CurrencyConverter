@@ -116,6 +116,7 @@ enum CurrencyConverter {
       var title: String
       var message: String
       var buttonTitle: String
+      var error: Error?
     }
   }
 

@@ -24,7 +24,7 @@ protocol CurrencyConverterDisplayLogic: class
 
 class CurrencyConverterViewController: UIViewController, CurrencyConverterDisplayLogic
 {
-  var interactor: CurrencyConverterBusinessLogic?
+  var interactor: CurrencyConverterBusinessLogic!
   var router: (NSObjectProtocol & CurrencyConverterRoutingLogic & CurrencyConverterDataPassing)?
 
   private let v = CurrencyConverterView()
@@ -62,32 +62,30 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
   {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    setup()
   }
   
   required init?(coder aDecoder: NSCoder)
   {
     super.init(coder: aDecoder)
-    setup()
   }
 
   // MARK: Setup
   
-  private func setup()
-  {
-    let viewController = self
-    let interactor = CurrencyConverterInteractor()
-    let presenter = CurrencyConverterPresenter()
-    let router = CurrencyConverterRouter()
-    viewController.interactor = interactor
-    viewController.router = router
-    interactor.presenter = presenter
-    interactor.currencyConversionWorker = CurrencyConversionWorker()
-    interactor.databaseWorker = DatabaseWorker()
-    presenter.viewController = viewController
-    router.viewController = viewController
-    router.dataStore = interactor
-  }
+//  private func setup()
+//  {
+//    let viewController = self
+//    let interactor = CurrencyConverterInteractor()
+//    let presenter = CurrencyConverterPresenter()
+//    let router = CurrencyConverterRouter()
+//    viewController.interactor = interactor
+//    viewController.router = router
+//    interactor.presenter = presenter
+//    interactor.currencyConversionWorker = CurrencyConversionWorker()
+//    interactor.databaseWorker = DatabaseWorker()
+//    presenter.viewController = viewController
+//    router.viewController = viewController
+//    router.dataStore = interactor
+//  }
   
   // MARK: Routing
   
@@ -163,6 +161,21 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
 
   func displayErrorAlert(viewModel: CurrencyConverter.ErrorAlert.ViewModel) {
     Alert.showSingleButtonAlert(on: self, title: viewModel.title, message: viewModel.message, buttonTitle: viewModel.buttonTitle, buttonHandler: nil, completion: nil)
+
+    if let knownError = viewModel.error as? ErrorType {
+      switch knownError {
+      case .InvalidConversionInput(_):
+        inputTextField?.text = "0.00"
+        break
+      case .DatabaseRequestedObjectNotExisting(_):
+        break
+      case .UnsuportedCurrencyRequest(_):
+        break
+      case .InsufficientConvertingFunds(_):
+        break
+      }
+    }
+
   }
 
   func fetchCurrencyConversionContract(request: CurrencyConverter.FetchCurrencyConversionContract.Request) {
@@ -361,6 +374,7 @@ extension CurrencyConverterViewController {
 
 extension CurrencyConverterViewController: UITextFieldDelegate {
   func textFieldDidChangeSelection(_ textField: UITextField) {
+    print("TextChanged!")
     let request = CurrencyConverter.FetchCurrencyConversion.Request(fromAmount: textField.text ?? "", fromCurrency: "EUR", toCurrency: "USD")
     performCurrencyConversion(request: request)
   }

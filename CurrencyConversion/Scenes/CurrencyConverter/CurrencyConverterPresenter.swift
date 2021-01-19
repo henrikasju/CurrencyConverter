@@ -25,7 +25,7 @@ protocol CurrencyConverterPresentationLogic
 class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
 {
   weak var viewController: CurrencyConverterDisplayLogic?
-  
+
   // MARK: Do something
 
   func presentCurrencyConversionErrorAlert(error: Error ) {
@@ -34,11 +34,11 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
     if let knownError = error as? ErrorType {
       switch knownError {
       case .InvalidConversionInput :
-        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Invalid Conversion", message: "Invalid conversion input " + knownError.localizedDescription, buttonTitle: "Close")
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Invalid Conversion", message: "Invalid conversion input ", buttonTitle: "Close", error: knownError)
       case .DatabaseRequestedObjectNotExisting:
-        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Database issue", message: "Requested object from the database does not exist. " + knownError.localizedDescription, buttonTitle: "Close")
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Database issue", message: "Requested object from the database does not exist. ", buttonTitle: "Close")
       case .UnsuportedCurrencyRequest:
-        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Database issue", message: "Requested unsupported currency. " + knownError.localizedDescription, buttonTitle: "Close")
+        viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Database issue", message: "Requested unsupported currency. ", buttonTitle: "Close")
       case .InsufficientConvertingFunds:
         viewModel = CurrencyConverter.ErrorAlert.ViewModel(title: "Invalid Conversion", message: "Insufficient conversion funds. " + knownError.localizedDescription, buttonTitle: "Close")
 
