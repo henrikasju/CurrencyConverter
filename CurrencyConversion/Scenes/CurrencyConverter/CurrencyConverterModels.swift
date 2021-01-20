@@ -48,10 +48,13 @@ enum CurrencyConverter {
       var fromAmount: String
       var fromCurrency: String
       var toCurrency: String
+      var toCell: CollectionView.CellType?
     }
 
     struct Response {
-      var conversion: ConvertedCurrency?
+      var fromConversion: ConvertedCurrency?
+      var toConversion: ConvertedCurrency?
+      var toCell: CollectionView.CellType?
       var error: Error?
     }
 
@@ -120,23 +123,10 @@ enum CurrencyConverter {
     }
   }
 
-  enum Something {
-    struct Request
-    {
-    }
-
-    struct Response
-    {
-    }
-
-    struct ViewModel
-    {
-    }
-  }
-
   enum CollectionView {
     enum CellType {
       case Balance
+      case CurrencyExchange
     }
 
     struct Request {
@@ -148,6 +138,12 @@ enum CurrencyConverter {
         var objects: Results<StoredCurrency>?
         var error: Error?
       }
+      struct CurrencyExchangeCell {
+        var image: UIImage?
+        var title: String?
+        var value: String?
+        var error: Error?
+      }
     }
 
     struct ViewModel {
@@ -156,7 +152,27 @@ enum CurrencyConverter {
         var holdingAmount: String
       }
 
+      struct CurrencyExchangeCell: DisplayedObject {
+        var image: UIImage?
+        var title: String
+        var value: String
+        var selectedCurrency: String?
+      }
+
       var displayedObjects: [DisplayedObject]
+    }
+  }
+
+  enum FetchAvailableCurrencies {
+    struct Request {
+    }
+
+    struct Response {
+      var currencies: [String]
+    }
+
+    struct ViewModel {
+      var currencies: [String]
     }
   }
 }

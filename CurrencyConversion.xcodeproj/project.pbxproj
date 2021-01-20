@@ -13,6 +13,8 @@
 		3639350125B71BF000C6D36A /* ConversionTax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3639350025B71BF000C6D36A /* ConversionTax.swift */; };
 		3639350525B71CB700C6D36A /* FlatRateTaxVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3639350425B71CB700C6D36A /* FlatRateTaxVisitor.swift */; };
 		3639350925B7512500C6D36A /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 3639350825B7512500C6D36A /* Swinject */; };
+		3639351025B7AB8B00C6D36A /* ToolbarPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3639350F25B7AB8B00C6D36A /* ToolbarPickerView.swift */; };
+		3639351325B884E800C6D36A /* DoneToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3639351225B884E800C6D36A /* DoneToolbar.swift */; };
 		363C648A25AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363C648925AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift */; };
 		36784D5B25ACB22E002B05ED /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 36784D5A25ACB22E002B05ED /* Alamofire */; };
 		36784D5F25ACBD6B002B05ED /* ConvertedCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36784D5E25ACBD6B002B05ED /* ConvertedCurrency.swift */; };
@@ -45,6 +47,8 @@
 		363934FC25B71A8200C6D36A /* Tax.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tax.swift; sourceTree = "<group>"; };
 		3639350025B71BF000C6D36A /* ConversionTax.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionTax.swift; sourceTree = "<group>"; };
 		3639350425B71CB700C6D36A /* FlatRateTaxVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatRateTaxVisitor.swift; sourceTree = "<group>"; };
+		3639350F25B7AB8B00C6D36A /* ToolbarPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarPickerView.swift; sourceTree = "<group>"; };
+		3639351225B884E800C6D36A /* DoneToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneToolbar.swift; sourceTree = "<group>"; };
 		363C648925AB177E00BDF96E /* TitleHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 		36784D5E25ACBD6B002B05ED /* ConvertedCurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertedCurrency.swift; sourceTree = "<group>"; };
 		36784D6225ADC55A002B05ED /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
@@ -133,6 +137,8 @@
 			children = (
 				363C648525AB171800BDF96E /* CollecitonView */,
 				36784D6225ADC55A002B05ED /* Alert.swift */,
+				3639350F25B7AB8B00C6D36A /* ToolbarPickerView.swift */,
+				3639351225B884E800C6D36A /* DoneToolbar.swift */,
 			);
 			path = UIElements;
 			sourceTree = "<group>";
@@ -312,12 +318,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3639351325B884E800C6D36A /* DoneToolbar.swift in Sources */,
 				36838CEE25A9DEC300AE937B /* CurrencyConverterRouter.swift in Sources */,
 				36784D5F25ACBD6B002B05ED /* ConvertedCurrency.swift in Sources */,
 				36838D0325AA072E00AE937B /* CurrencyConverterView.swift in Sources */,
 				3639350125B71BF000C6D36A /* ConversionTax.swift in Sources */,
 				36838CEC25A9DEC300AE937B /* CurrencyConverterPresenter.swift in Sources */,
 				3689BB7125B5B78800FD4858 /* DatabaseWorker.swift in Sources */,
+				3639351025B7AB8B00C6D36A /* ToolbarPickerView.swift in Sources */,
 				363934F625B719F600C6D36A /* Visitable.swift in Sources */,
 				36838CF025A9DEC300AE937B /* CurrencyConverterViewController.swift in Sources */,
 				369A38F325A9D5290052981F /* AppDelegate.swift in Sources */,

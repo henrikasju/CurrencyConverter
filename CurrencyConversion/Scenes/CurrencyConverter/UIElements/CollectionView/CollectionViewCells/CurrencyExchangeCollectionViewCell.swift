@@ -8,11 +8,23 @@
 import UIKit
 import Stevia
 
+enum ExchangeCellType {
+  case Sell
+  case Receive
+}
+
+protocol CurrencyExchangeCollectionViewCellDelegate {
+  func currencySelectionButtonPressed(_ cell: CurrencyExchangeCollectionViewCell, _ button: UIButton)
+  func textFieldHasBeenEdited(_ cell: CurrencyExchangeCollectionViewCell, _ textField: UITextField, _ type: ExchangeCellType)
+}
+
 class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
 
   class var identifier: String{
       return "CurrencyExchangeCollectionViewCell"
   }
+
+  var type: ExchangeCellType!
 
   let actionImageView = UIImageView()
   let actionLabel = UILabel()
@@ -23,6 +35,19 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
   var localFontColor = UIColor(named: "standardTextColor")
   var currencySelectionSymbolConfiguration = UIImage.SymbolConfiguration(weight: .medium)
   var borderColor = UIColor(named: "cellBorderColor")
+
+  var viewModel: CurrencyConverter.CollectionView.ViewModel.CurrencyExchangeCell! {
+    didSet {
+      actionImageView.image = viewModel.image
+      actionLabel.text = viewModel.title
+      inputTextField.text = viewModel.value
+      if let selectedCurrency = viewModel.selectedCurrency {
+        currencySelectionButton.text(selectedCurrency)
+      }
+    }
+  }
+
+  var delegate: CurrencyExchangeCollectionViewCellDelegate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -43,9 +68,8 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
     horizontalStackView.addArrangedSubview(currencySelectionButton)
 
     bottomBorderView.backgroundColor = borderColor
-    bottomBorderView.height(2).right(-12)
+    bottomBorderView.height(1).right(-12)
     bottomBorderView.Left == actionLabel.Left
-//    bottomBorderView.Bottom == safeAreaLayoutGuide.Top
     
     horizontalStackView.axis = .horizontal
     horizontalStackView.alignment = .center
@@ -70,10 +94,9 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
     actionLabel.numberOfLines = 1
     actionLabel.font = localFont
     actionLabel.textColor = localFontColor
-//    actionLabel.lineBreak
 
     inputTextField.backgroundColor = .clear
-    inputTextField.text = "110.00"
+    inputTextField.text = "0.00"
     inputTextField.textAlignment = .right
     inputTextField.font = localFont
     inputTextField.textColor = localFontColor
@@ -92,6 +115,16 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
     currencySelectionButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -26)
     currencySelectionButton.imageEdgeInsets.left = 4
 
+    currencySelectionButton.addTarget(self, action: #selector(currencySelectionButtonPressed(sender:)), for: .touchUpInside)
+    inputTextField.addTarget(self, action: #selector(textFieldHasBeenEdited(sender:)), for: .editingChanged)
+  }
+
+  @objc func currencySelectionButtonPressed(sender: UIButton) {
+    delegate?.currencySelectionButtonPressed(self, sender)
+  }
+
+  @objc func textFieldHasBeenEdited(sender: UITextField) {
+    delegate?.textFieldHasBeenEdited(self, sender, self.type)
   }
 
   required init?(coder: NSCoder) {

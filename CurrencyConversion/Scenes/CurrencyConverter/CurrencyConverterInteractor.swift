@@ -19,21 +19,27 @@ protocol CurrencyConverterBusinessLogic
   func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   func fetchCollectionViewModels(request: CurrencyConverter.CollectionView.Request)
   func fetchCurrencyConversionContract(request: CurrencyConverter.FetchCurrencyConversionContract.Request)
-  func CompleteCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request)
+  func completeCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request)
+  func fetchAvailableCurrencies(request: CurrencyConverter.FetchAvailableCurrencies.Request)
 }
 
 protocol CurrencyConverterDataStore
 {
-  //var name: String { get set }
 }
 
-class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConverterDataStore
-{
+class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConverterDataStore {
   var presenter: CurrencyConverterPresentationLogic!
 //  var worker: CurrencyConversionWorker?
   var currencyConversionWorker: CurrencyConversionWorker!
   var databaseWorker: DatabaseWorker!
-  let numberFormatter = NumberFormatter()
+  // Should be using current locale, and format every data to users locale at presenter.
+  var numberFormatter: NumberFormatter = {
+    let formater = NumberFormatter()
+    formater.locale = Locale(identifier: "en_US")
+    formater.numberStyle = .decimal
+
+    return formater
+  }()
 
   init(presenter: CurrencyConverterPresentationLogic, currencyConversionWorker: CurrencyConversionWorker, databaseWorker: DatabaseWorker) {
     self.presenter = presenter
@@ -43,7 +49,8 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
 
   func fetchCurrencyConversion(request: CurrencyConverter.FetchCurrencyConversion.Request)
   {
-    if !validateConversionInputValue(inputValue: request.fromAmount) {
+    let inputValue = convertStringToDouble(value: request.fromAmount)
+    if inputValue == nil || inputValue! < 0 {
       print("Error invalid number format!")
       let response = CurrencyConverter.FetchCurrencyConversion.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCurrencyConversion(response: response)
@@ -56,18 +63,29 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
       { response in
         switch response.result {
         case .success:
-          let conversion = CurrencyConverter.FetchCurrencyConversion.Response(conversion: response.value)
+          let conversion: CurrencyConverter.FetchCurrencyConversion.Response
+          if let toCell = request.toCell {
+              conversion = CurrencyConverter.FetchCurrencyConversion.Response(
+              fromConversion: ConvertedCurrency(amount: request.fromAmount, currency: request.fromCurrency),
+              toConversion: response.value,
+              toCell: toCell)
+          }else {
+            conversion = CurrencyConverter.FetchCurrencyConversion.Response(toConversion: response.value)
+          }
           self.presenter?.presentCurrencyConversion(response: conversion)
         case let .failure(error):
           let conversion = CurrencyConverter.FetchCurrencyConversion.Response(error: error)
           self.presenter?.presentCurrencyConversion(response: conversion)
         }
       })
+  }
 
+  private func convertStringToDouble(value: String) -> Double? {
+    return numberFormatter.number(from: value)?.doubleValue
   }
 
   private func validateConversionInputValue(inputValue: String) -> Bool {
-    let value: Double? = numberFormatter.number(from: inputValue)?.doubleValue
+    let value: Double? = convertStringToDouble(value: inputValue)
     return (value == nil ? false : (value! <= 0 ? false : true) )
   }
 
@@ -85,6 +103,8 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
       }
 
       presenter?.presentBalanceCells(response: response)
+    default:
+      break
     }
   }
 
@@ -131,7 +151,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
             }
             
           }else{
-            // TODO: Unable to receive currency from DB
+            // Unable to receive currency from DB
             let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest())
             self.presenter?.presentCurrencyConversionContract(response: response)
           }
@@ -143,7 +163,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
       })
   }
 
-  func CompleteCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request) {
+  func completeCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request) {
     if !validateConversionInputValue(inputValue: request.fromAmount) {
       print("Error invalid number format!")
       let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput())
@@ -196,7 +216,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
               }()
 
               // Saving transaction
-              self.databaseWorker?.addConvertedCurrencyTransaction(object: transaction) { error in
+              self.databaseWorker?.addConvertedCurrencyTransaction(objects: [transaction]) { error in
                 let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: error)
                 self.presenter?.presentCompleteCurrencyConversionContract(response: response)
               }
@@ -230,7 +250,7 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
 
 
           }else{
-            // TODO: Unable to receive currency from DB
+            // Unable to receive currency from DB
             let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.UnsuportedCurrencyRequest())
             self.presenter?.presentCompleteCurrencyConversionContract(response: response)
           }
@@ -250,4 +270,16 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
     return conversionTax
   }
 
+  func fetchAvailableCurrencies(request: CurrencyConverter.FetchAvailableCurrencies.Request) {
+    // gathering currency names from users stored currencies
+    let storedCurrencies = databaseWorker.getAllStoredCurrencies()
+    var currencies: [String] = []
+    if let objects = storedCurrencies {
+      currencies = objects.map({ storedCurrency -> String in
+        storedCurrency.name
+      })
+    }
+    let response = CurrencyConverter.FetchAvailableCurrencies.Response(currencies: currencies)
+    presenter.presentAvailableCurrencies(response: response)
+  }
 }

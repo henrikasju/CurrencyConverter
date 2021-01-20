@@ -19,12 +19,11 @@ import UIKit
 
 protocol CurrencyConverterDataPassing
 {
-  var dataStore: CurrencyConverterDataStore? { get }
+//  var dataStore: CurrencyConverterDataStore? { get }
 }
 
 class CurrencyConverterRouter: NSObject, CurrencyConverterRoutingLogic, CurrencyConverterDataPassing
 {
-  weak var viewController: CurrencyConverterViewController?
-  var dataStore: CurrencyConverterDataStore?
-  
+//  weak var viewController: CurrencyConverterViewController?
+//  var dataStore: CurrencyConverterDataStore?
 }

@@ -20,13 +20,12 @@ protocol CurrencyConverterPresentationLogic
   func presentBalanceCells(response: CurrencyConverter.CollectionView.Response.BalanceCell)
   func presentCurrencyConversionContract(response: CurrencyConverter.FetchCurrencyConversionContract.Response)
   func presentCompleteCurrencyConversionContract(response: CurrencyConverter.CompleteCurrencyConversionContract.Response)
+  func presentAvailableCurrencies(response: CurrencyConverter.FetchAvailableCurrencies.Response)
 }
 
 class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
 {
   weak var viewController: CurrencyConverterDisplayLogic?
-
-  // MARK: Do something
 
   func presentCurrencyConversionErrorAlert(error: Error ) {
     var viewModel: CurrencyConverter.ErrorAlert.ViewModel
@@ -52,15 +51,33 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
     viewController?.displayErrorAlert(viewModel: viewModel)
   }
   
-  func presentCurrencyConversion(response: CurrencyConverter.FetchCurrencyConversion.Response)
-  {
+  func presentCurrencyConversion(response: CurrencyConverter.FetchCurrencyConversion.Response) {
     if let error = response.error {
       print("Display ERROR!!!!!")
       presentCurrencyConversionErrorAlert(error: error)
 
-    }else if let conversion = response.conversion {
-      let viewModel = CurrencyConverter.FetchCurrencyConversion.ViewModel(receive: "+ " + conversion.amount)
+    }else if response.toCell != nil,
+             let fromConversion = response.fromConversion,
+             let toConversion = response.toConversion {
+      let sellCell = CurrencyConverter.CollectionView.ViewModel.CurrencyExchangeCell(
 
+      image: UIImage(named: "currencySellImage"),
+      title: "Sell",
+        value: fromConversion.amount,
+      selectedCurrency: fromConversion.currency)
+
+      let receiveCell = CurrencyConverter.CollectionView.ViewModel.CurrencyExchangeCell(
+
+        image: UIImage(named: "currencyReceiveImage"),
+        title: "Receive",
+        value: ("+ " + toConversion.amount),
+        selectedCurrency: toConversion.currency)
+
+      let viewModel = CurrencyConverter.CollectionView.ViewModel(displayedObjects: [sellCell, receiveCell])
+      viewController?.displayCurrencyConversionOnExchangeCells(viewModel: viewModel)
+
+    }else if let toConversion = response.toConversion {
+      let viewModel = CurrencyConverter.FetchCurrencyConversion.ViewModel(receive: toConversion.amount)
       viewController?.displayCurrencyConversion(viewModel: viewModel)
     }
   }
@@ -116,6 +133,15 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
 
       let viewModel = CurrencyConverter.CollectionView.ViewModel(displayedObjects: cellViewModels)
       viewController?.displayCollectionViewBalances(viewModel: viewModel)
+    }
+  }
+
+  func presentAvailableCurrencies(response: CurrencyConverter.FetchAvailableCurrencies.Response) {
+    if response.currencies.count > 0 {
+      let viewModel = CurrencyConverter.FetchAvailableCurrencies.ViewModel(currencies: response.currencies)
+      viewController?.storeAvailableCurrencies(viewModel: viewModel)
+    }else {
+      presentCurrencyConversionErrorAlert(error: ErrorType.DatabaseRequestedObjectNotExisting())
     }
   }
 }

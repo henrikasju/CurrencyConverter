@@ -34,7 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     let launchedBefore = defaults.bool(forKey: "launchedBefore")
     if !launchedBefore {
-
+      
       let euros: StoredCurrency = {
         let currency = StoredCurrency()
         currency.name = "EUR"

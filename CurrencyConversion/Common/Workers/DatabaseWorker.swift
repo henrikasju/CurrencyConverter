@@ -8,8 +8,6 @@
 import Foundation
 import RealmSwift
 
-// TODO Should me as DatabaseManager!
-
 final class DatabaseWorker {
 
   typealias DatabaseRequestCompletionHandler = (Error?) -> ()
@@ -18,16 +16,6 @@ final class DatabaseWorker {
 
   init() {
     realm = try! Realm()
-  }
-
-  func addStoredCurrency(object: StoredCurrency, completion: DatabaseRequestCompletionHandler) {
-    do {
-      try realm.write {
-        realm.add(object)
-      }
-    } catch {
-      completion(error)
-    }
   }
 
   func addStoredCurrencies(objects: [StoredCurrency], completion: DatabaseRequestCompletionHandler){
@@ -70,16 +58,6 @@ final class DatabaseWorker {
     }
   }
 
-  func addConvertedCurrencyTransaction(object: ConvertedCurrencyTransaction, completion: DatabaseRequestCompletionHandler){
-    do {
-      try realm.write {
-        realm.add(object)
-      }
-    } catch {
-      completion(error)
-    }
-  }
-
   func addConvertedCurrencyTransaction(objects: [ConvertedCurrencyTransaction], completion: DatabaseRequestCompletionHandler) {
     do {
       try realm.write {
@@ -94,4 +72,5 @@ final class DatabaseWorker {
     let objects = realm.objects(ConvertedCurrencyTransaction.self)
     return objects
   }
+
 }

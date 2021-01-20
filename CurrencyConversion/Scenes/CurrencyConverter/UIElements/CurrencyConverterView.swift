@@ -44,7 +44,7 @@ class CurrencyConverterView: UIView {
     collectionView.Top == Top
     collectionView.Bottom == submitButton.Top - 12
 
-    collectionView.backgroundColor = .cyan
+    collectionView.backgroundColor = .clear
     collectionView.showsVerticalScrollIndicator = false
   }
 
