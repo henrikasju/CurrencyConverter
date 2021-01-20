@@ -26,7 +26,6 @@ class TitleHeaderCollectionReusableView: UICollectionReusableView {
     )
 
     titleLabel.top(24).bottom(10).left(0).right(0)
-//    titleLabel.fillContainer()
     titleLabel.backgroundColor = .clear
     titleLabel.font = localFont
     titleLabel.textColor = localFontColor

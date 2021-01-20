@@ -53,7 +53,6 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
   
   func presentCurrencyConversion(response: CurrencyConverter.FetchCurrencyConversion.Response) {
     if let error = response.error {
-      print("Display ERROR!!!!!")
       presentCurrencyConversionErrorAlert(error: error)
 
     }else if response.toCell != nil,
@@ -84,7 +83,6 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
 
   func presentCurrencyConversionContract(response: CurrencyConverter.FetchCurrencyConversionContract.Response) {
     if let error = response.error {
-      print("Display ERROR!!!!!")
       presentCurrencyConversionErrorAlert(error: error)
 
     }else if let fromAmount = response.fromAmount, let fromCurrency = response.fromCurrency,
@@ -103,7 +101,6 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
 
   func presentCompleteCurrencyConversionContract(response: CurrencyConverter.CompleteCurrencyConversionContract.Response) {
     if let error = response.error {
-      print("Display ERROR!!!!!")
       presentCurrencyConversionErrorAlert(error: error)
 
     }else if let totalAmount = response.totalAmount, let fromCurrency = response.fromCurrency,
@@ -121,7 +118,6 @@ class CurrencyConverterPresenter: CurrencyConverterPresentationLogic
 
   func presentBalanceCells(response: CurrencyConverter.CollectionView.Response.BalanceCell) {
     if let error = response.error {
-      print("Display ERROR!!!!!")
       presentCurrencyConversionErrorAlert(error: error)
 
     }else if let storedCurrencies = response.objects {

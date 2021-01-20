@@ -44,12 +44,10 @@ class HorizontalBalanceCollectionViewCell: UICollectionViewCell {
 
     horizontalStackView.backgroundColor = .clear
 
-    currencyLabel.text("EUR")
     currencyLabel.font = localFont
     currencyLabel.textColor = localFontColor
     currencyLabel.backgroundColor = .clear
 
-    amountLabel.text("00.00")
     amountLabel.font = localFont
     amountLabel.textColor = localFontColor
     amountLabel.backgroundColor = .clear

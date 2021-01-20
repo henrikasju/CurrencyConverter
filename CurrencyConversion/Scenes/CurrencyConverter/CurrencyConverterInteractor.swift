@@ -51,7 +51,6 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
   {
     let inputValue = convertStringToDouble(value: request.fromAmount)
     if inputValue == nil || inputValue! < 0 {
-      print("Error invalid number format!")
       let response = CurrencyConverter.FetchCurrencyConversion.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCurrencyConversion(response: response)
     }
@@ -111,7 +110,6 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
   func fetchCurrencyConversionContract(request: CurrencyConverter.FetchCurrencyConversionContract.Request) {
 
     if !validateConversionInputValue(inputValue: request.fromAmount) {
-      print("Error invalid number format!")
       let response = CurrencyConverter.FetchCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCurrencyConversionContract(response: response)
     }
@@ -165,7 +163,6 @@ class CurrencyConverterInteractor: CurrencyConverterBusinessLogic, CurrencyConve
 
   func completeCurrencyConversionContract(request: CurrencyConverter.CompleteCurrencyConversionContract.Request) {
     if !validateConversionInputValue(inputValue: request.fromAmount) {
-      print("Error invalid number format!")
       let response = CurrencyConverter.CompleteCurrencyConversionContract.Response(error: ErrorType.InvalidConversionInput())
       presenter?.presentCompleteCurrencyConversionContract(response: response)
     }

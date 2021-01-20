@@ -83,12 +83,9 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
 
     actionImageView.backgroundColor = .clear
     actionImageView.heightEqualsWidth()
-    let image = UIImage(named: "currencySellImage")
-    actionImageView.image = image
     actionImageView.contentMode = .scaleToFill
 
     actionLabel.backgroundColor = .clear
-    actionLabel.text("Sell")
     actionLabel.setContentHuggingPriority(.required, for: .horizontal)
     actionLabel.width(Int(frame.width/3))
     actionLabel.numberOfLines = 1
@@ -96,14 +93,12 @@ class CurrencyExchangeCollectionViewCell: UICollectionViewCell {
     actionLabel.textColor = localFontColor
 
     inputTextField.backgroundColor = .clear
-    inputTextField.text = "0.00"
     inputTextField.textAlignment = .right
     inputTextField.font = localFont
     inputTextField.textColor = localFontColor
 
     currencySelectionButton.width(80)
     currencySelectionButton.backgroundColor = .clear
-    currencySelectionButton.text("EUR")
     currencySelectionButton.setImage(
       UIImage(systemName: "chevron.down",
               withConfiguration: currencySelectionSymbolConfiguration),

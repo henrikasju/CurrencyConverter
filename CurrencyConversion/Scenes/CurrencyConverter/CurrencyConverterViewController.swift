@@ -13,8 +13,6 @@
 import UIKit
 import Stevia
 
-// TODO: on scroll close keyboard!
-
 protocol CurrencyConverterDisplayLogic: class
 {
   func displayCurrencyConversion(viewModel: CurrencyConverter.FetchCurrencyConversion.ViewModel)
@@ -173,12 +171,9 @@ class CurrencyConverterViewController: UIViewController, CurrencyConverterDispla
   }
 
   func displayCurrencyConversionContract(viewModel: CurrencyConverter.FetchCurrencyConversionContract.ViewModel) {
-    // TODO: Alert text is poorly formated
     Alert.showBasicAlert(on: self, title: "Convert Currency", message: viewModel.message, leftButtonTitle: "Cancel", rightButttonTitle: "Continue") { _ in
-      print("Cancelled")
     } rightButtonHandler: { _ in
       // Procced with currency conversion!
-      print("Convert Currency!")
       if let inputCell = self.v.collectionView.cellForItem(at: IndexPath(row: 0, section: 1)) as? CurrencyExchangeCollectionViewCell,
          let fromCurrency = self.selectedSellCurrency,
          let toCurrency = self.selectedReceiveCurrency {
@@ -347,7 +342,6 @@ extension CurrencyConverterViewController {
 
   @objc func submitButtonPressed(sender: UIButton) {
     if sender == v.submitButton {
-      print("Submit button pressed!")
       endEditing()
       let sellCell = v.collectionView.cellForItem(at: IndexPath(row: 0, section: 1)) as? CurrencyExchangeCollectionViewCell
 
@@ -455,11 +449,9 @@ extension CurrencyConverterViewController {
 extension CurrencyConverterViewController: CurrencyExchangeCollectionViewCellDelegate {
   func currencySelectionButtonPressed(_ cell: CurrencyExchangeCollectionViewCell, _ button: UIButton) {
     currencySelectionDummyTextField.resignFirstResponder()
-    print(availableCurrencies)
 
     switch cell.type {
     case .Receive:
-      print("Exchange cell currency selection button pressed. Type - Receive")
       currencyPickerView.selectionOwner = .Receive
       let indexOfSelectedCurrency = getAvailableCurrenciesForOutput().firstIndex(of: selectedReceiveCurrency!) ?? 0
       currencyPickerView.selectRow(indexOfSelectedCurrency, inComponent: 0, animated: true)
@@ -467,7 +459,6 @@ extension CurrencyConverterViewController: CurrencyExchangeCollectionViewCellDel
       break
     case .Sell:
       currencyPickerView.selectionOwner = .Sell
-      print("Exchange cell currency selection button pressed. Type - Sell")
       let indexOfSelectedCurrency = getAvailableCurrenciesForInput().firstIndex(of: selectedSellCurrency!) ?? 0
       currencyPickerView.selectRow(indexOfSelectedCurrency, inComponent: 0, animated: true)
       currencySelectionDummyTextField.becomeFirstResponder()
@@ -479,7 +470,6 @@ extension CurrencyConverterViewController: CurrencyExchangeCollectionViewCellDel
 
   func textFieldHasBeenEdited(_ cell: CurrencyExchangeCollectionViewCell, _ textField: UITextField, _ type: ExchangeCellType) {
     // should be using current locale ;/
-    print("Cell: ", type, "text = ", textField.text)
     textField.text = textField.text?.replacingOccurrences(of: ",", with: ".")
 
     if let fromCurrency = selectedSellCurrency, let toCurrency = selectedReceiveCurrency {
