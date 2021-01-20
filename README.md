@@ -7,6 +7,7 @@ IOS app for currency conversion
 ## Features
 - [x] Conversion rates is fetch over the API
 - [x] Currency balances are stored locally
+- [x] Realtime estimate on conversion rate
 - [x] Flexible way of calculating conversion (commission) fee using Visitor design pattern
 - [x] Clean Swift structure (VIP)
 - [x] Feedback via alerts
