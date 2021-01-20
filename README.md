@@ -2,6 +2,7 @@
 IOS app for currency conversion
 
 ## Current state of app
+![Image of current state of app](README_Files/app_flow.gif)
 
 ## Features
 - [x] Conversion rates is fetch over the API
